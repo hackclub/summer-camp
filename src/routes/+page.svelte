@@ -110,16 +110,16 @@
 			{/snippet}
 
 			<div class="h-10 sm:h-180"></div>
-			{@render SignAndText('step 1', 'Grab your spot', 'RSVP with your email — it takes ten seconds.', true)}
+			{@render SignAndText('step 1', 'Grab your spot', "RSVP with your email - we'll email you with the info!", true)}
 
 			<div class="h-5 sm:h-15"></div>
-			{@render SignAndText('step 2', 'Get started', 'Show up day one — no setup or experience needed.', false)}
+			{@render SignAndText('step 2', 'Get started', 'Show up on day one - no experience or setup necessary!', false)}
 
 			<div class="h-10 sm:h-30"></div>
-			{@render SignAndText('step 3', 'Learn to code', 'Build real projects in live sessions, 12–3 PM ET.', true)}
+			{@render SignAndText('step 3', 'Learn to code', 'Learn to make real code projects during our live sessions', true)}
 
 			<div class="h-10 sm:h-30"></div>
-			{@render SignAndText('step 4', 'Win prizes', 'Earn free prizes and play games as you go.', false)}
+			{@render SignAndText('step 4', 'Win prizes', 'Earn free prizes and have fun as you go', false)}
 		</div>
 	</div>
 	<div class="z-5 flex h-fit min-h-200 w-screen flex-col items-center bg-[#fec798] pb-20 sm:mt-160">
@@ -135,7 +135,11 @@
 			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
 				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Is this really free?</h3>
 				<p class="text-[#a3523b]">
-					Yes — completely free, no strings attached. We’re part of Hack Club, a 501(c)(3) nonprofit that supports a global network of 100,000+ teen coders and makers across 119+ countries. They’ve already shipped 10,000+ real prizes to teens through programs like Arcade, High Seas, and Stardance. So every class, talk, and game here is free — and the prizes are covered too. No fees, no catch.
+					Yep, completely free with no strings attached. We're part of Hack Club, a 501(c)(3) nonprofit
+					behind a global network of 100,000+ teen coders and makers in over 119 countries. They've
+					already shipped more than 10,000 real prizes to teens through programs like Arcade, High
+					Seas, and Stardance. Every class, talk, and game here is free, and the prizes are covered
+					too. No fees, no catch.
 				</p>
 			</div>
 
@@ -143,32 +147,34 @@
 				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Who can join?</h3>
 				<p class="text-[#a3523b]">
 					Summer camp is built for high schoolers and teens, but anyone curious about coding is
-					welcome. You don’t need any experience — we start from the very basics and build up from
-					there.
+					welcome. You don't need any experience to start. We begin with the very basics and build up
+					from there.
 				</p>
 			</div>
 
 			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
 				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Do I need any experience?</h3>
 				<p class="text-[#a3523b]">
-					Nope! Whether you’ve never written a line of code or you’ve already shipped a few projects,
-					there’s something for you. Every session is hands-on and beginner-friendly.
+					Nope! Whether you've never written a line of code or you've already shipped a few projects,
+					there's something here for you. Every session is hands-on and easy to follow.
 				</p>
 			</div>
 
 			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
 				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">What do I need to take part?</h3>
 				<p class="text-[#a3523b]">
-					Just a computer with an internet connection. The tools we use are free, and we’ll walk you
-					through setting everything up on day one — no downloads or accounts required ahead of time.
+					Just a computer with an internet connection. All the tools we use are free, and we'll walk
+					you through setting everything up on day one. There's nothing to download or sign up for
+					ahead of time.
 				</p>
 			</div>
 
 			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
 				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">When and where does it happen?</h3>
 				<p class="text-[#a3523b]">
-					Camp runs June 23–July 17, weekdays from 12–3 PM Eastern, fully online. Can’t make every
-					session? No problem — drop in whenever you can and pick up where you left off.
+					Camp runs June 23 to July 17, weekdays from 12 to 3 PM Eastern, and it's fully online.
+					Can't make every session? No worries. Drop in whenever you can and pick up right where you
+					left off.
 				</p>
 			</div>
 		</div>
