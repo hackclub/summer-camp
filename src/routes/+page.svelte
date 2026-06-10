@@ -38,6 +38,13 @@
 				use:enhance
 				class="flex w-full max-w-md flex-col items-center gap-4 sm:flex-row sm:gap-2"
 			>
+				<!-- Honeypot: hidden from real users; bots that fill it get silently dropped. -->
+				<div class="absolute left-[-9999px]" aria-hidden="true">
+					<label>
+						Company
+						<input type="text" name="company" tabindex="-1" autocomplete="off" />
+					</label>
+				</div>
 				<input
 					type="email"
 					name="email"
@@ -54,6 +61,16 @@
 			</form>
 			{#if form?.missing}
 				<p class="font-luckiest-guy text-xl text-[#a3523b] drop-shadow-md">Email is required!</p>
+			{/if}
+			{#if form?.invalid}
+				<p class="font-luckiest-guy text-xl text-[#a3523b] drop-shadow-md">
+					Please enter a valid email!
+				</p>
+			{/if}
+			{#if form?.rateLimited}
+				<p class="font-luckiest-guy text-xl text-[#a3523b] drop-shadow-md">
+					Whoa, slow down! Try again in a few minutes.
+				</p>
 			{/if}
 			{#if form?.error}
 				<p class="font-luckiest-guy text-xl text-[#a3523b] drop-shadow-md">

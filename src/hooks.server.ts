@@ -1,0 +1,14 @@
+import type { Handle } from '@sveltejs/kit';
+
+// Baseline security headers applied to every response. CSP itself is configured
+// in svelte.config.js (kit.csp) so SvelteKit can hash its own inline bootstrap.
+export const handle: Handle = async ({ event, resolve }) => {
+	const response = await resolve(event);
+
+	response.headers.set('X-Content-Type-Options', 'nosniff');
+	response.headers.set('X-Frame-Options', 'DENY');
+	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+	response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+
+	return response;
+};
