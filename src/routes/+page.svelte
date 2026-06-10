@@ -113,10 +113,10 @@
 			{@render SignAndText('step 1', 'Grab your spot', "RSVP with your email - we'll email you with the info!", true)}
 
 			<div class="h-5 sm:h-15"></div>
-			{@render SignAndText('step 2', 'Get started', 'Show up on day one - no experience or setup necessary!', false)}
+			{@render SignAndText('step 2', 'Get started', "It's okay to have no experience - just show up on day one and dive in!", false)}
 
 			<div class="h-10 sm:h-30"></div>
-			{@render SignAndText('step 3', 'Learn to code', 'Learn to make real code projects during our live sessions', true)}
+			{@render SignAndText('step 3', 'Learn with others', 'Build real code projects alongside other teens in our live sessions', true)}
 
 			<div class="h-10 sm:h-30"></div>
 			{@render SignAndText('step 4', 'Win prizes', 'Earn free prizes and have fun as you go', false)}
