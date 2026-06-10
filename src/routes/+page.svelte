@@ -77,34 +77,49 @@
 			class="block h-auto w-[143vw] max-w-none translate-x-6 sm:translate-x-0"
 		/>
 		<div class="absolute inset-0 flex h-fit w-screen max-w-none flex-col">
-			{#snippet SignAndText(signText: string, textText: string, flipped: boolean = false)}
+			{#snippet SignAndText(
+				signText: string,
+				header: string,
+				subheading: string,
+				flipped: boolean = false
+			)}
 				<div
 					class={[
-						'flex items-center justify-between px-1 font-luckiest-guy text-lg sm:px-20 sm:text-2xl md:text-5xl',
+						'flex items-center justify-between gap-2 px-1 font-luckiest-guy sm:px-20',
 						!flipped && 'flex-row',
 						flipped && 'flex-row-reverse'
 					]}
 				>
 					<Sign type="sign" {flipped}>
-						<span class=" text-[#fecaa5]">
+						<span class="text-base text-[#fecaa5] sm:text-2xl md:text-5xl">
 							{signText}
 						</span>
 					</Sign>
-					<p class="mx-1 -translate-y-7 text-[#a3523b] sm:mx-0 sm:-translate-y-18">{textText}</p>
+					<div
+						class={[
+							'mx-1 flex max-w-[55%] -translate-y-7 flex-col text-[#a3523b] sm:mx-0 sm:max-w-md sm:-translate-y-18',
+							flipped ? 'items-end text-right' : 'items-start text-left'
+						]}
+					>
+						<p class="text-lg leading-tight sm:text-2xl md:text-5xl">{header}</p>
+						<p class="text-xs leading-snug text-[#a3523b]/80 sm:text-sm md:text-xl">
+							{subheading}
+						</p>
+					</div>
 				</div>
 			{/snippet}
 
 			<div class="h-10 sm:h-180"></div>
-			{@render SignAndText('step 1', 'grab your spot', true)}
+			{@render SignAndText('step 1', 'Grab your spot', 'RSVP with your email — it takes ten seconds.', true)}
 
 			<div class="h-5 sm:h-15"></div>
-			{@render SignAndText('step 2', 'get started', false)}
+			{@render SignAndText('step 2', 'Get started', 'Show up day one — no setup or experience needed.', false)}
 
 			<div class="h-10 sm:h-30"></div>
-			{@render SignAndText('step 3', 'learn to code', true)}
+			{@render SignAndText('step 3', 'Learn to code', 'Build real projects in live sessions, 12–3 PM ET.', true)}
 
 			<div class="h-10 sm:h-30"></div>
-			{@render SignAndText('step 4', 'get free prizes and games!', false)}
+			{@render SignAndText('step 4', 'Win prizes', 'Earn free prizes and play games as you go.', false)}
 		</div>
 	</div>
 	<div class="z-5 flex h-fit min-h-200 w-screen flex-col items-center bg-[#fec798] pb-20 sm:mt-160">
@@ -118,25 +133,42 @@
 
 		<div class="mt-10 flex w-full max-w-3xl flex-col gap-6 px-4">
 			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
-				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Is tis really free?</h3>
+				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Is this really free?</h3>
 				<p class="text-[#a3523b]">
 					Yes — completely free, no strings attached. We’re part of Hack Club, a 501(c)(3) nonprofit that supports a global network of 100,000+ teen coders and makers across 119+ countries. They’ve already shipped 10,000+ real prizes to teens through programs like Arcade, High Seas, and Stardance. So every class, talk, and game here is free — and the prizes are covered too. No fees, no catch.
 				</p>
 			</div>
 
 			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
-				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Question 2 Placeholder</h3>
+				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Who can join?</h3>
 				<p class="text-[#a3523b]">
-					Answer 2 placeholder text goes here. You can add more detailed information for users to
-					read.
+					Summer camp is built for high schoolers and teens, but anyone curious about coding is
+					welcome. You don’t need any experience — we start from the very basics and build up from
+					there.
 				</p>
 			</div>
 
 			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
-				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Question 3 Placeholder</h3>
+				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">Do I need any experience?</h3>
 				<p class="text-[#a3523b]">
-					Answer 3 placeholder text goes here. Frequently asked questions are a great way to provide
-					information.
+					Nope! Whether you’ve never written a line of code or you’ve already shipped a few projects,
+					there’s something for you. Every session is hands-on and beginner-friendly.
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
+				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">What do I need to take part?</h3>
+				<p class="text-[#a3523b]">
+					Just a computer with an internet connection. The tools we use are free, and we’ll walk you
+					through setting everything up on day one — no downloads or accounts required ahead of time.
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
+				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">When and where does it happen?</h3>
+				<p class="text-[#a3523b]">
+					Camp runs June 23–July 17, weekdays from 12–3 PM Eastern, fully online. Can’t make every
+					session? No problem — drop in whenever you can and pick up where you left off.
 				</p>
 			</div>
 		</div>
