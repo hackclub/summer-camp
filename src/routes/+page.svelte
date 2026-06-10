@@ -28,7 +28,7 @@
 		</Sign>
 
 		{#if form?.success}
-			<p class="mt-4 text-center font-luckiest-guy text-2xl text-[#fecaa5] drop-shadow-md">
+			<p class="mt-4 text-center font-luckiest-guy text-2xl text-black drop-shadow-md">
 				Thanks for RSVPing! See you at camp!
 			</p>
 		{:else}

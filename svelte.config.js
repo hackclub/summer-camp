@@ -16,9 +16,11 @@ const config = {
 			directives: {
 				'default-src': ['self'],
 				'script-src': ['self'],
-				'style-src': ['self', 'unsafe-inline'],
+				// Google Fonts: the stylesheet is fetched from fonts.googleapis.com
+				// (layout.css @import) and the font files from fonts.gstatic.com.
+				'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
 				'img-src': ['self', 'data:'],
-				'font-src': ['self'],
+				'font-src': ['self', 'https://fonts.gstatic.com'],
 				'connect-src': ['self'],
 				'object-src': ['none'],
 				'base-uri': ['self'],
