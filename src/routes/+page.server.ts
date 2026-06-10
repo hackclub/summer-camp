@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import Airtable from 'airtable';
-import { API_KEY, BASE_ID } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const actions: Actions = {
 	default: async ({ request }) => {
@@ -14,7 +14,14 @@ export const actions: Actions = {
 			});
 		}
 
-		const base = new Airtable({ apiKey: API_KEY }).base(BASE_ID);
+		if (!env.API_KEY || !env.BASE_ID) {
+			console.error('Missing API_KEY or BASE_ID environment variable');
+			return fail(500, {
+				error: true
+			});
+		}
+
+		const base = new Airtable({ apiKey: env.API_KEY }).base(env.BASE_ID);
 
 		try {
 			await new Promise((resolve, reject) => {
