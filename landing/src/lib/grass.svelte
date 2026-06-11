@@ -22,6 +22,17 @@
 		animation-delay: var(--animation-delay);
 	}
 
+	/* On phones/tablets (and for reduced-motion users), disable the per-blade
+	   infinite transform animation. The page renders hundreds of grass blades;
+	   that many simultaneously-animating composited layers exhausts mobile
+	   WebKit's GPU/memory budget and crashes the tab ("A problem repeatedly
+	   occurred"). Static grass is cheap, so we just drop the animation there. */
+	@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+		img {
+			animation: none;
+		}
+	}
+
 	@keyframes sway {
 		0%,
 		100% {
