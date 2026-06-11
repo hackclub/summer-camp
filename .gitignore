@@ -1,6 +1,9 @@
 node_modules
 .node-portable
 
+# Local screenshot scratch (headless-Edge verification shots + driver)
+.shots
+
 # OS
 .DS_Store
 Thumbs.db

@@ -23,7 +23,7 @@
 	/>
 	<div
 		class={[
-			'absolute flex text-center',
+			'painted absolute flex text-center',
 			type == 'plank' && 'inset-0 h-full w-full items-center justify-center px-6 pt-1 sm:pt-3',
 			// For the directional sign, confine the content to the board (the top
 			// ~45% of the image), avoiding the arrow taper and the post below.
@@ -35,3 +35,13 @@
 		{@render children()}
 	</div>
 </div>
+
+<style>
+	/* Painted-on lettering: cream paint with a flat dark offset shadow (like
+	   the art's cartoon outlines) so the words sit on the board instead of
+	   floating over it. Shadow is in em so it scales with each sign's text. */
+	.painted {
+		color: #ffe9cf;
+		text-shadow: 0.045em 0.07em 0 rgba(58, 21, 11, 0.55);
+	}
+</style>
