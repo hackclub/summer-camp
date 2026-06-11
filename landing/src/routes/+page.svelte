@@ -110,11 +110,11 @@
 				>
 					<Sign type="sign" {flipped}>
 						<div class="flex flex-col items-center gap-0.5 leading-tight sm:gap-1">
-							<span class="text-[7px] tracking-wide uppercase opacity-90 sm:text-base">
+							<span class="text-[9px] tracking-wide uppercase opacity-90 sm:text-xl">
 								{signText}
 							</span>
-							<span class="text-[10px] leading-none sm:text-2xl md:text-3xl">{header}</span>
-							<span class="text-[5px] font-thin opacity-85 sm:text-[11px] md:text-sm">
+							<span class="text-[13px] leading-none sm:text-4xl md:text-5xl">{header}</span>
+							<span class="text-[7px] font-thin opacity-85 sm:text-sm md:text-base">
 								{subheading}
 							</span>
 						</div>
@@ -138,7 +138,7 @@
 	<div class="z-5 flex h-fit min-h-200 w-screen flex-col items-center bg-[#fec798] pb-20 sm:mt-160">
 		<Sign type="plank">
 			<p
-				class="px-5 text-center font-luckiest-guy text-base font-thin sm:text-xl md:text-5xl"
+				class="px-5 text-center font-luckiest-guy text-2xl font-thin sm:text-4xl md:text-7xl"
 			>
 				FAQ
 			</p>
