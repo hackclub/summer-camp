@@ -19,7 +19,8 @@ const config = {
 				// Google Fonts: the stylesheet is fetched from fonts.googleapis.com
 				// (layout.css @import) and the font files from fonts.gstatic.com.
 				'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
-				'img-src': ['self', 'data:'],
+				// Site art (forest, road, signs, grass) is served from the Hack Club CDN.
+				'img-src': ['self', 'data:', 'https://cdn.hackclub.com'],
 				'font-src': ['self', 'https://fonts.gstatic.com'],
 				'connect-src': ['self'],
 				'object-src': ['none'],

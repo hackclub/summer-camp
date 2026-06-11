@@ -1,5 +1,5 @@
 <script>
-	import { asset } from '$app/paths';
+	import { cdn, fallback } from '$lib/cdn';
 
 	let { id = 0 } = $props(); // for staggered animation delays
 
@@ -10,7 +10,8 @@
 </script>
 
 <img
-	src={asset(`/grass/${randomSvg}.svg`)}
+	src={cdn.grass[randomSvg]}
+	onerror={fallback(`/grass/${randomSvg}.svg`)}
 	alt="grass"
 	style="--animation-delay: {id * 0.05}s; left: {randomX}%; top: {randomY}%;"
 	class="absolute h-auto w-[2vw]"

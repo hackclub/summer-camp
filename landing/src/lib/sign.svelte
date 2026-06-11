@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { asset } from '$app/paths';
+	import { cdn, fallback } from '$lib/cdn';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -11,7 +11,8 @@
 
 <div class="relative inline-block h-fit w-fit">
 	<img
-		src={asset(type == 'plank' ? '/plank.png' : '/sign.png')}
+		src={type == 'plank' ? cdn.plank : cdn.sign}
+		onerror={fallback(type == 'plank' ? '/plank.png' : '/sign.png')}
 		alt="sign"
 		class={[
 			'block h-auto  max-w-none ',
@@ -22,11 +23,13 @@
 	/>
 	<div
 		class={[
-			'absolute inset-0 flex h-full w-full justify-center',
-			type == 'sign' && 'pt-5 sm:pt-17',
-			type == 'sign' && !flipped && 'translate-x-[-2%] ',
-			type == 'sign' && flipped && 'translate-x-[2%]',
-			type == 'plank' && 'items-center justify-center px-6 pt-1 sm:pt-3'
+			'absolute flex text-center',
+			type == 'plank' && 'inset-0 h-full w-full items-center justify-center px-6 pt-1 sm:pt-3',
+			// For the directional sign, confine the content to the board (the top
+			// ~45% of the image), avoiding the arrow taper and the post below.
+			type == 'sign' && 'top-[7%] h-[40%] items-center justify-center',
+			type == 'sign' && !flipped && 'left-[5%] right-[19%]',
+			type == 'sign' && flipped && 'left-[19%] right-[5%]'
 		]}
 	>
 		{@render children()}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { asset } from '$app/paths';
+	import { cdn, fallback } from '$lib/cdn';
 	import Grass from '$lib/grass.svelte';
 	import Sign from '$lib/sign.svelte';
 	import { enhance } from '$app/forms';
@@ -18,7 +18,7 @@
 	<div
 		class="0 sm:pt-30x absolute inset-0 z-15 flex h-screen w-screen flex-col items-center gap-10 px-2 pt-80 sm:gap-20 sm:px-40 sm:pt-30 md:gap-10 md:px-20"
 	>
-		<img src={asset('/title.png')} alt="" class="h-fit w-auto -rotate-2 object-contain" />
+		<img src={cdn.title} onerror={fallback('/title.png')} alt="" class="h-fit w-auto -rotate-2 object-contain" />
 		<Sign type="plank">
 			<p
 				class="px-5 text-center font-luckiest-guy text-sm font-thin text-[#fecaa5] sm:text-base md:text-2xl"
@@ -82,14 +82,16 @@
 
 	<!-- <Plank text="xd" type="plank" /> -->
 	<img
-		src={asset('/forest.png')}
+		src={cdn.forest}
+		onerror={fallback('/forest.png')}
 		alt=""
 		class="z-10 h-[110vh] w-auto object-cover object-[90%_50%] sm:w-screen"
 	/>
 
 	<div class="relative z-5 -m-14 flex h-auto w-screen max-w-none flex-col items-center sm:-m-160">
 		<img
-			src={asset('/road.png')}
+			src={cdn.road}
+			onerror={fallback('/road.png')}
 			alt=""
 			class="block h-auto w-[143vw] max-w-none translate-x-6 sm:translate-x-0"
 		/>
@@ -102,27 +104,21 @@
 			)}
 				<div
 					class={[
-						'flex items-center justify-between gap-2 px-1 font-luckiest-guy sm:px-20',
-						!flipped && 'flex-row',
-						flipped && 'flex-row-reverse'
+						'flex px-1 font-luckiest-guy sm:px-20',
+						flipped ? 'justify-end' : 'justify-start'
 					]}
 				>
 					<Sign type="sign" {flipped}>
-						<span class="text-base text-[#fecaa5] sm:text-2xl md:text-5xl">
-							{signText}
-						</span>
+						<div class="flex flex-col items-center gap-0.5 leading-tight text-[#fecaa5] sm:gap-1">
+							<span class="text-[7px] tracking-wide uppercase opacity-90 sm:text-base">
+								{signText}
+							</span>
+							<span class="text-[10px] leading-none sm:text-2xl md:text-3xl">{header}</span>
+							<span class="text-[5px] font-thin text-[#fecaa5]/85 sm:text-[11px] md:text-sm">
+								{subheading}
+							</span>
+						</div>
 					</Sign>
-					<div
-						class={[
-							'mx-1 flex max-w-[55%] -translate-y-7 flex-col text-[#a3523b] sm:mx-0 sm:max-w-md sm:-translate-y-18',
-							flipped ? 'items-end text-right' : 'items-start text-left'
-						]}
-					>
-						<p class="text-lg leading-tight sm:text-2xl md:text-5xl">{header}</p>
-						<p class="text-xs leading-snug text-[#a3523b]/80 sm:text-sm md:text-xl">
-							{subheading}
-						</p>
-					</div>
 				</div>
 			{/snippet}
 
