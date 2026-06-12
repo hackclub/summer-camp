@@ -110,11 +110,11 @@
 				>
 					<Sign type="sign" {flipped}>
 						<div class="flex flex-col items-center gap-0.5 leading-tight sm:gap-1">
-							<span class="text-[9px] tracking-wide uppercase opacity-90 sm:text-xl">
+							<span class="text-[10px] tracking-wide uppercase opacity-90 sm:text-xl">
 								{signText}
 							</span>
-							<span class="text-[13px] leading-none sm:text-4xl md:text-5xl">{header}</span>
-							<span class="text-[7px] font-thin opacity-85 sm:text-sm md:text-base">
+							<span class="text-base leading-none sm:text-4xl md:text-5xl">{header}</span>
+							<span class="text-[8px] font-thin opacity-85 sm:text-sm md:text-base">
 								{subheading}
 							</span>
 						</div>
@@ -202,7 +202,7 @@
 					target="_blank"
 					rel="noopener noreferrer"
 					class="text-bp-warning underline transition-colors"
-					href="https://hackclub.com?utm_source=fallout"
+					href="https://hackclub.com?utm_source=summer-camp"
 				>
 					Hack Club
 				</a>

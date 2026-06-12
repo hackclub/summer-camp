@@ -17,8 +17,8 @@
 		class={[
 			'block h-auto  max-w-none ',
 			flipped && '-scale-x-100',
-			type == 'sign' && 'w-60 sm:w-170',
-			type == 'plank' && 'w-100 sm:w-170'
+			type == 'sign' && 'w-72 sm:w-170',
+			type == 'plank' && 'w-100 max-w-[96vw] sm:w-170 sm:max-w-none'
 		]}
 	/>
 	<div
@@ -27,7 +27,7 @@
 			type == 'plank' && 'inset-0 h-full w-full items-center justify-center px-6 pt-1 sm:pt-3',
 			// For the directional sign, confine the content to the board (the top
 			// ~45% of the image), avoiding the arrow taper and the post below.
-			type == 'sign' && 'top-[7%] h-[40%] items-center justify-center',
+			type == 'sign' && 'top-[7%] h-[40%] items-center justify-center px-2 sm:px-0',
 			type == 'sign' && !flipped && 'left-[5%] right-[19%]',
 			type == 'sign' && flipped && 'left-[19%] right-[5%]'
 		]}
