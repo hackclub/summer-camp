@@ -1,0 +1,14 @@
+node_modules
+build
+.svelte-kit
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+.vscode
+.node-portable
+*.log
+Dockerfile
+.dockerignore
+README.md

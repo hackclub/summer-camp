@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@theme {
+	--font-luckiest-guy: 'Luckiest Guy', cursive;
+
+	/* Camp palette, promoted from the hardcoded hexes on the landing page. */
+	--color-grass: #80b464; /* primary / success / live */
+	--color-grass-dark: #5f9148; /* hover, borders on green */
+	--color-wood: #a3523b; /* borders, headings */
+	--color-wood-dark: #3a150b; /* body text, shadows */
+	--color-peach: #fecaa5; /* input bg, soft surfaces */
+	--color-sand: #fec798; /* page background */
+	--color-tan: #e3ad7e; /* muted card bg */
+	--color-cream: #ffe9cf; /* painted text, card surfaces */
+	--color-berry: #c0392b; /* destructive / error */
+	--color-sky: #7ec8e3; /* info */
+}
+
+/* Painted-on lettering: cream paint with a flat dark offset shadow so words
+   sit on the board instead of floating over it (same as landing's sign). */
+.painted {
+	color: #ffe9cf;
+	text-shadow: 0.045em 0.07em 0 rgba(58, 21, 11, 0.55);
+}
