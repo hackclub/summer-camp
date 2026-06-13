@@ -19,7 +19,7 @@
 		name="q"
 		value={data.q}
 		placeholder="Search projects..."
-		class="w-full rounded-xl border-4 border-wood bg-peach px-4 py-2 text-wood-dark placeholder-tan focus:ring-4 focus:ring-grass/50 focus:outline-none"
+		class="min-w-0 flex-1 rounded-xl border-4 border-wood bg-peach px-4 py-2 text-wood-dark placeholder-tan focus:ring-4 focus:ring-grass/50 focus:outline-none"
 	/>
 	<Button type="submit" variant="secondary">Search</Button>
 </form>

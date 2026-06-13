@@ -10,7 +10,7 @@
 	// (heavier toward the top, where the reading happens) keeps the scene ambient
 	// so the content panels stay the focus.
 	const backdrop =
-		`linear-gradient(rgba(255,233,207,0.62), rgba(255,233,207,0.32)), url('${cdn.forest}')`;
+		`linear-gradient(rgba(255,233,207,0.48), rgba(255,233,207,0.22)), url('${cdn.forest}')`;
 </script>
 
 <div class="relative flex min-h-screen flex-col">
