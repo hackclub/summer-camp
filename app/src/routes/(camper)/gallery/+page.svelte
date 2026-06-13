@@ -13,7 +13,7 @@
 
 <PageHeader title="The gallery" subtitle="Real projects, built at camp" />
 
-<form method="GET" class="mx-auto mb-6 flex max-w-md gap-2">
+<form method="GET" class="mx-auto mb-6 flex max-w-md flex-col gap-2 sm:flex-row">
 	<input
 		type="search"
 		name="q"
