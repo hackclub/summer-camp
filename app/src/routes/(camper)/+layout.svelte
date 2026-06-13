@@ -6,7 +6,12 @@
 	let { data, children } = $props();
 </script>
 
-<div class="flex min-h-screen flex-col bg-sand">
+<!-- Campsite backdrop: a touch of sky up top fading into the sand "ground",
+     warming to tan where it meets the grass strip. bg-fixed so it sits behind
+     content like scenery instead of scrolling with it. -->
+<div
+	class="flex min-h-screen flex-col bg-gradient-to-b from-sky/40 via-sand via-30% to-tan bg-fixed"
+>
 	<Header user={data.user} balance={data.balance} />
 	<main class="mx-auto w-full max-w-5xl flex-1 px-4 py-6 pb-24 sm:pb-6">
 		{@render children()}
