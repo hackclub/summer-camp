@@ -23,7 +23,7 @@
 			<p
 				class="px-5 text-center font-luckiest-guy text-sm font-thin sm:text-base md:text-2xl"
 			>
-				A free virtual summer camp running June 23–July 17. Join us weekdays, 12–3 PM Eastern, for hands-on coding, games, and free prizes.
+				A free virtual summer camp running June 29–July 17. Join us weekdays, 12–3 PM Eastern, for hands-on coding, games, and free prizes.
 			</p>
 		</Sign>
 
@@ -185,7 +185,7 @@
 			<div class="flex flex-col gap-2 rounded-xl bg-[#e3ad7e] p-6 shadow-md">
 				<h3 class="font-luckiest-guy text-xl text-[#a3523b]">When and where does it happen?</h3>
 				<p class="text-[#a3523b]">
-					Camp runs June 23 to July 17, weekdays from 12 to 3 PM Eastern, and it's fully online.
+					Camp runs June 29 to July 17, weekdays from 12 to 3 PM Eastern, and it's fully online.
 					Can't make every session? No worries. Drop in whenever you can and pick up right where you
 					left off.
 				</p>
@@ -322,7 +322,7 @@
 						<p>
 							Got any questions? <a
 								class="hover:text-[#fecaa5] hover:underline"
-								href="mailto:camp@hackclub.com"
+								href="mailto:jenin@hackclub.com"
 							>
 								Reach out to us here
 							</a>
