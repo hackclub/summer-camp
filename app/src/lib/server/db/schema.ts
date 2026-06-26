@@ -98,25 +98,49 @@ export const attendance = pgTable(
 	(t) => [uniqueIndex('attendance_user_day_idx').on(t.userId, t.campDayId)]
 );
 
-export const projects = pgTable('projects', {
-	id: id(),
-	userId: text('user_id')
-		.notNull()
-		.references(() => users.id, { onDelete: 'cascade' }),
-	title: text('title').notNull(),
-	description: text('description'),
-	githubUrl: text('github_url'),
-	playableUrl: text('playable_url'),
-	screenshotUrl: text('screenshot_url'), // single hero image on the Hack Club CDN
-	status: text('status', { enum: ['building', 'submitted', 'approved', 'rejected'] })
-		.notNull()
-		.default('building'),
-	shippedAt: timestamp('shipped_at', { withTimezone: true }),
-	createdAt: createdAt(),
-	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-	airtableRecordId: text('airtable_record_id'),
-	syncedAt: timestamp('synced_at', { withTimezone: true })
-});
+export const projects = pgTable(
+	'projects',
+	{
+		id: id(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		// The camp day whose workshop this project came out of. Null for projects
+		// made outside a session; one project per camper per day (see index below).
+		campDayId: text('camp_day_id').references(() => campDays.id, { onDelete: 'set null' }),
+		title: text('title').notNull(),
+		description: text('description'),
+		githubUrl: text('github_url'),
+		playableUrl: text('playable_url'),
+		screenshotUrl: text('screenshot_url'), // single hero image on the Hack Club CDN
+		status: text('status', { enum: ['building', 'submitted', 'approved', 'rejected'] })
+			.notNull()
+			.default('building'),
+		shippedAt: timestamp('shipped_at', { withTimezone: true }),
+		createdAt: createdAt(),
+		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+		airtableRecordId: text('airtable_record_id'),
+		syncedAt: timestamp('synced_at', { withTimezone: true }),
+		// Hackatime project keys for this ship, comma-separated. Ari requires at
+		// least one of these (or journals) or it 422s the ingest. TODO: capture
+		// this from the camper on the ship form; for now it's null and shipping is
+		// blocked until populated (which is the intended "contact Jenin" gate).
+		hackatimeProjects: text('hackatime_projects'),
+		// Ari review state. ariId is Ari's own submission id (AR-####), set when a
+		// decision webhook arrives. ariStatus tracks the last known Ari state and
+		// ariError holds the last failed-ingest message for debugging.
+		ariId: text('ari_id'),
+		ariStatus: text('ari_status', {
+			enum: ['queued', 'approved', 'changes', 'rejected', 'withdrawn', 'error']
+		}),
+		ariError: text('ari_error')
+	},
+	(t) => [
+		uniqueIndex('projects_user_day_idx')
+			.on(t.userId, t.campDayId)
+			.where(sql`${t.campDayId} IS NOT NULL`)
+	]
+);
 
 export const projectReviews = pgTable('project_reviews', {
 	id: id(),

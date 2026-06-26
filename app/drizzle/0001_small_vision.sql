@@ -1,0 +1,3 @@
+ALTER TABLE "projects" ADD COLUMN "camp_day_id" text;--> statement-breakpoint
+ALTER TABLE "projects" ADD CONSTRAINT "projects_camp_day_id_camp_days_id_fk" FOREIGN KEY ("camp_day_id") REFERENCES "public"."camp_days"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "projects_user_day_idx" ON "projects" USING btree ("user_id","camp_day_id") WHERE "projects"."camp_day_id" IS NOT NULL;

@@ -4,7 +4,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Check, X } from 'lucide-svelte';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	const checklist = $derived([
 		{ label: 'Project has a name', ok: !data.missing.title },
@@ -63,6 +63,12 @@
 					Once you ship, counselors will review it — points land when it's approved. Shipped
 					projects are locked, so make sure it's ready!
 				</p>
+				{#if form?.shipFailed}
+					<p class="mb-4 rounded-lg bg-berry/10 p-3 text-sm font-bold text-berry">
+						Something went wrong sending your ship for review, so it wasn't submitted. Please try
+						again in a minute — if it keeps happening, contact Jenin.
+					</p>
+				{/if}
 				<form method="POST">
 					<Button type="submit" size="lg">Ship it for real 🚀</Button>
 				</form>

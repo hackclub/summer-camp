@@ -46,7 +46,7 @@ export async function awardAttendance(
 export async function awardShipBonus(
 	userId: string,
 	projectId: string,
-	reviewerId: string
+	reviewerId: string | null
 ): Promise<void> {
 	await db
 		.insert(pointsTransactions)

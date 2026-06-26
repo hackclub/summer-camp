@@ -1,24 +1,14 @@
-import { building, dev } from '$app/environment';
+import { building } from '$app/environment';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { validateSession } from '$lib/server/auth/session';
-import { env } from '$env/dynamic/private';
 
-// Boot-time work: run committed migrations once, then start the Airtable sync
-// loop. Guarded so neither runs during `vite build` prerendering.
+// Boot-time work: run committed migrations once. (The old periodic Airtable
+// roster/projects sync is retired — Ari is the reviewer now, and ship records go
+// to Airtable on ship + on each Ari decision via the webhook.)
 if (!building) {
 	const { runMigrations } = await import('$lib/server/db');
 	await runMigrations();
-
-	if (env.SYNC_ENABLED === 'true' && !dev) {
-		const { runSync } = await import('$lib/server/airtable');
-		setInterval(
-			() => {
-				runSync().catch((e) => console.error('[sync] failed:', e));
-			},
-			5 * 60 * 1000
-		);
-	}
 }
 
 // Baseline security headers applied to every response. CSP itself is configured
@@ -48,6 +38,7 @@ const guard: Handle = async ({ event, resolve }) => {
 		path.startsWith('/login/') ||
 		path.startsWith('/gallery') ||
 		path === '/api/health' ||
+		path === '/api/ari/webhook' ||
 		path === '/robots.txt';
 
 	if (!isPublic && !event.locals.user) {
