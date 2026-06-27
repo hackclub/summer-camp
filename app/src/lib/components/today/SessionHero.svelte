@@ -77,7 +77,7 @@
 		</p>
 		<p class="text-3xl text-wood-dark"><Countdown target={campState.nextStartsAt} {now} /></p>
 		<div class="flex flex-wrap justify-center gap-3">
-			<Button href="/projects" variant="secondary">Work on your project</Button>
+			<Button href="/submit" variant="secondary">Submit a project</Button>
 			<Button href="/gallery" variant="secondary">Browse the gallery</Button>
 		</div>
 	{:else}

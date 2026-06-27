@@ -13,46 +13,21 @@
 <div class="flex flex-col gap-6">
 	<SessionHero days={data.days} />
 
-	{#if data.today}
-		<Card title="Today's project">
-			{#if !data.todayProject}
+	{#if data.openCount > 0}
+		<Card title="Submit a project">
+			{#if data.toSubmit > 0}
 				<p class="mb-4 text-wood-dark">
-					Done with today's workshop? Ship what you built — add the details and send it off for
-					points. You get one project for <strong>{data.today.title}</strong>.
+					You have <strong>{data.toSubmit}</strong>
+					{data.toSubmit === 1 ? 'lesson' : 'lessons'} open for submission. Ship what you built before
+					it locks!
 				</p>
-				<form method="POST" action="?/startToday">
-					<Button type="submit" size="lg">
-						<Rocket class="size-5" /> Ship today's project
-					</Button>
-				</form>
-			{:else if data.todayProject.status === 'building'}
-				<p class="mb-4 text-wood-dark">
-					Your <strong>{data.today.title}</strong> project is saved as a draft — finish it up and ship
-					it for points.
-				</p>
-				<div class="flex flex-wrap gap-3">
-					<Button href={`/projects/${data.todayProject.id}/ship`} size="lg">
-						<Rocket class="size-5" /> Finish &amp; ship it
-					</Button>
-					<Button href={`/projects/${data.todayProject.id}/edit`} variant="secondary">
-						Edit details
-					</Button>
-				</div>
-			{:else if data.todayProject.status === 'rejected'}
-				<div class="mb-4 flex items-center gap-3">
-					<Badge status="rejected" />
-					<p class="text-wood-dark">Counselors asked for a few changes before this one ships.</p>
-				</div>
-				<Button href={`/projects/${data.todayProject.id}/edit`}>Make changes</Button>
+				<Button href="/submit" size="lg">
+					<Rocket class="size-5" /> Submit a project
+				</Button>
 			{:else}
-				<div class="flex items-center gap-3">
-					<Badge status={data.todayProject.status} />
-					<p class="text-wood-dark">
-						{data.todayProject.status === 'approved'
-							? 'Shipped and approved — nice work! 🎉'
-							: 'Shipped! Counselors are reviewing it now.'}
-					</p>
-				</div>
+				<p class="text-wood-dark">
+					You've submitted everything that's open right now — nice work! 🎉
+				</p>
 			{/if}
 		</Card>
 	{/if}
@@ -90,8 +65,8 @@
 	<Card title="My projects">
 		{#if data.myProjects.length === 0}
 			<p class="text-wood-dark">
-				No projects yet — once you've been to a session, ship what you built right from the
-				<strong>Today's project</strong> card above.
+				Nothing shipped yet — once a session has happened, submit what you built from the
+				<strong>Submit a project</strong> card above.
 			</p>
 		{:else}
 			<div class="flex flex-col gap-2">

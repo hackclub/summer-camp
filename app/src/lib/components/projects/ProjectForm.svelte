@@ -14,11 +14,13 @@
 	let {
 		project = null,
 		errors = {},
-		locked = false
+		locked = false,
+		hideSubmit = false
 	}: {
 		project?: ProjectFields | null;
 		errors?: Record<string, string>;
 		locked?: boolean;
+		hideSubmit?: boolean;
 	} = $props();
 
 	let screenshotUrl = $state(project?.screenshotUrl ?? '');
@@ -118,7 +120,7 @@
 		<input type="hidden" name="screenshotUrl" value={screenshotUrl} />
 	</div>
 
-	{#if !locked}
+	{#if !locked && !hideSubmit}
 		<div class="flex gap-3">
 			<Button type="submit" size="lg">Save</Button>
 		</div>

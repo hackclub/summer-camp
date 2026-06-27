@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { Tent, CalendarDays, Rocket, Trees, Coins } from 'lucide-svelte';
+	import { Tent, CalendarDays, Send, Rocket, Trees, Coins } from 'lucide-svelte';
 
 	const links = [
 		{ href: '/', label: 'Today', icon: Tent },
 		{ href: '/schedule', label: 'Schedule', icon: CalendarDays },
+		{ href: '/submit', label: 'Submit', icon: Send },
 		{ href: '/projects', label: 'Projects', icon: Rocket },
 		{ href: '/gallery', label: 'Gallery', icon: Trees },
 		{ href: '/shop', label: 'Shop', icon: Coins }

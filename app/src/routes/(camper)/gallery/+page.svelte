@@ -30,8 +30,8 @@
 		body={data.q
 			? 'Try a different search?'
 			: 'Projects will appear here once campers start shipping. Yours could be first!'}
-		actionLabel="Start a project"
-		actionHref="/projects/new"
+		actionLabel="Submit a project"
+		actionHref="/submit"
 	/>
 {:else}
 	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

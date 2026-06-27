@@ -5,7 +5,7 @@
 	const options = [
 		{ icon: Home, title: 'Go to my dashboard', desc: 'See today’s session, your points, and your projects.', destination: '/' },
 		{ icon: CalendarDays, title: 'See the schedule', desc: 'Check what’s on and when the next workshop starts.', destination: '/schedule' },
-		{ icon: Hammer, title: 'Start a project', desc: 'Jump straight in and begin building something.', destination: '/projects' }
+		{ icon: Hammer, title: 'Submit a project', desc: 'Ship what you built in a session for points.', destination: '/submit' }
 	];
 </script>
 

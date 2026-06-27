@@ -24,7 +24,7 @@
 			name="name"
 			bind:value={name}
 			required
-			placeholder="e.g. Mira Okonkwo"
+			placeholder="e.g. John Hackclub"
 			error={form?.error}
 		/>
 		<div class="flex justify-end">

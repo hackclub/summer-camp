@@ -1,7 +1,6 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/theme/PageHeader.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 
 	let { data } = $props();
@@ -9,18 +8,14 @@
 
 <svelte:head><title>My projects — Hack Club Summer Camp</title></svelte:head>
 
-<PageHeader title="My projects" />
-
-<div class="mb-6 text-center">
-	<Button href="/projects/new">+ New project</Button>
-</div>
+<PageHeader title="My projects" subtitle="Everything you've shipped" />
 
 {#if data.myProjects.length === 0}
 	<EmptyState
-		title="No projects yet"
-		body="Every great camper starts somewhere. Start building and ship it for points!"
-		actionLabel="Start your first project"
-		actionHref="/projects/new"
+		title="Nothing shipped yet"
+		body="Projects show up here once you submit them for review. Head to Submit to ship a lesson's project!"
+		actionLabel="Go to Submit"
+		actionHref="/submit"
 	/>
 {:else}
 	<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

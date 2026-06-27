@@ -1,14 +1,12 @@
-import { and, desc, eq } from 'drizzle-orm';
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import { and, desc, eq, inArray } from 'drizzle-orm';
+import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { announcements, campDays, projects } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/auth/guards';
-import { getCampState, type CampDayLite } from '$lib/camp-time';
-import { newId } from '$lib/server/ids';
+import { openLessons } from '$lib/server/lessons';
+import type { CampDayLite } from '$lib/camp-time';
 
-/** Published camp days as the lite shape the camp-time clock works with. */
-function loadDays() {
+function loadDays(): Promise<CampDayLite[]> {
 	return db
 		.select({
 			id: campDays.id,
@@ -21,13 +19,7 @@ function loadDays() {
 		.where(eq(campDays.published, true));
 }
 
-/** Today's camp day once its session has launched (live or wrapped), else null.
- *  This is the window in which a camper may create that day's project. */
-function launchedDay(days: CampDayLite[]): CampDayLite | null {
-	const state = getCampState(new Date(), days);
-	if (state.kind === 'live' || state.kind === 'post-session') return state.day;
-	return null;
-}
+const shippedStatuses = ['submitted', 'approved', 'rejected'] as const;
 
 export const load: PageServerLoad = async (event) => {
 	const user = requireUser(event);
@@ -43,54 +35,29 @@ export const load: PageServerLoad = async (event) => {
 		db
 			.select()
 			.from(projects)
-			.where(eq(projects.userId, user.id))
+			.where(and(eq(projects.userId, user.id), inArray(projects.status, [...shippedStatuses])))
 			.orderBy(desc(projects.updatedAt))
 			.limit(4)
 	]);
 
-	const day = launchedDay(days);
-	const todayProject = day
-		? ((
-				await db
-					.select()
-					.from(projects)
-					.where(and(eq(projects.userId, user.id), eq(projects.campDayId, day.id)))
-					.limit(1)
-			)[0] ?? null)
-		: null;
+	// Open lessons (today, once launched, + yesterday) and how many the camper
+	// still needs to ship — drives the "Submit a project" prompt.
+	const open = openLessons(new Date(), days);
+	let toSubmit = 0;
+	for (const day of open) {
+		const [p] = await db
+			.select({ status: projects.status })
+			.from(projects)
+			.where(and(eq(projects.userId, user.id), eq(projects.campDayId, day.id)))
+			.limit(1);
+		if (!p || !shippedStatuses.includes(p.status as (typeof shippedStatuses)[number])) toSubmit++;
+	}
 
 	return {
 		days,
 		announcements: latestAnnouncements,
 		myProjects,
-		today: day ? { id: day.id, title: day.title } : null,
-		todayProject
+		openCount: open.length,
+		toSubmit
 	};
-};
-
-export const actions: Actions = {
-	// One button on the dashboard: create (or reopen) today's project, then drop
-	// the camper into the existing edit → ship flow. The launched-day check and
-	// the one-per-day lookup are re-done server-side so the client can't forge them.
-	startToday: async (event) => {
-		const user = requireUser(event);
-		const day = launchedDay(await loadDays());
-		if (!day) return fail(400, { notLaunched: true });
-
-		const [existing] = await db
-			.select({ id: projects.id })
-			.from(projects)
-			.where(and(eq(projects.userId, user.id), eq(projects.campDayId, day.id)))
-			.limit(1);
-		if (existing) redirect(303, `/projects/${existing.id}/edit`);
-
-		const id = newId();
-		await db.insert(projects).values({
-			id,
-			userId: user.id,
-			campDayId: day.id,
-			title: day.title
-		});
-		redirect(303, `/projects/${id}/edit?saved=1`);
-	}
 };
