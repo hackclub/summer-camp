@@ -16,6 +16,15 @@
 			<p class="mb-4 text-wood-dark">All set — you can ship projects and order prizes.</p>
 			<Button href={data.returnTo}>Keep going</Button>
 		</Card>
+	{:else if data.blocked}
+		<Card title="You're not eligible for prizes">
+			<p class="mb-4 text-wood-dark">{data.ineligibleMessage}</p>
+			<p class="text-sm text-wood-dark/70">
+				You can still join sessions and build projects — shipping for prizes and the shop just aren't
+				available. Questions? Email
+				<a href="mailto:camp@hackclub.com" class="underline">camp@hackclub.com</a>.
+			</p>
+		</Card>
 	{:else if data.status === 'pending'}
 		<Card title="Verification in review">
 			<p class="mb-4 text-wood-dark">

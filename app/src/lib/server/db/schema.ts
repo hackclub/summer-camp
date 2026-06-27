@@ -22,6 +22,10 @@ export const users = pgTable('users', {
 	slackId: text('slack_id'),
 	hackClubId: text('hack_club_id'), // OIDC `sub`, set after IDV
 	identityVerified: boolean('identity_verified').notNull().default(false),
+	// Latest raw result from Hack Club Identity's YSWS check API (verified_eligible
+	// / verified_but_over_18 / rejected / pending / needs_submission / not_found).
+	// Null = never checked. identityVerified only flips true on verified_eligible.
+	yswsCheckResult: text('ysws_check_result'),
 	role: text('role', { enum: ['camper', 'admin'] })
 		.notNull()
 		.default('camper'),

@@ -29,6 +29,13 @@
       "when": 1781897271651,
       "tag": "0003_add_onboarding",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781898271651,
+      "tag": "0004_add_ysws_check",
+      "breakpoints": true
     }
   ]
 }

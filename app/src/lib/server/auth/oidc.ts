@@ -4,6 +4,12 @@ import type { Cookies } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
 import { env } from '$env/dynamic/private';
+import {
+	checkYswsStatus,
+	decideEligibility,
+	isEligible,
+	type EligibilityDecision
+} from '$lib/server/auth/eligibility';
 
 // Hack Club Identity step-up. This is NOT a login method — it attaches
 // verification attributes to the already-logged-in (magic link) user, which
@@ -61,6 +67,7 @@ export async function buildAuthorizeRedirect(cookies: Cookies, returnTo: string)
 
 export interface IdentityResult {
 	verified: boolean;
+	decision: EligibilityDecision;
 	returnTo: string;
 }
 
@@ -110,23 +117,34 @@ export async function handleCallback(
 		verification_status?: string;
 	};
 
-	const verified =
-		info.verification_status === 'verified' || info.verification_status === 'eligible';
-
-	if (verified) {
-		const current = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-		await db
-			.update(users)
-			.set({
-				identityVerified: true,
-				hackClubId: info.sub,
-				slackId: info.slack_id ?? current[0]?.slackId ?? null,
-				name: current[0]?.name ?? info.name ?? null
-			})
-			.where(eq(users.id, userId));
+	// Eligibility comes from Identity's external check API (keyed by the IDV id),
+	// not the coarse OIDC claim. If the API is unreachable we fall back to the
+	// claim so an outage can't lock everyone out.
+	const checkResult = info.sub ? await checkYswsStatus(info.sub) : null;
+	let decision = decideEligibility(checkResult);
+	if (
+		checkResult === null &&
+		(info.verification_status === 'verified' || info.verification_status === 'eligible')
+	) {
+		decision = 'eligible';
 	}
+	const verified = isEligible(decision);
 
-	return { verified, returnTo: safeReturnTo(returnTo) };
+	// Always record the identity linkage + latest check result; only flip
+	// identityVerified when the camper is actually eligible.
+	const current = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+	await db
+		.update(users)
+		.set({
+			identityVerified: verified ? true : (current[0]?.identityVerified ?? false),
+			yswsCheckResult: checkResult,
+			hackClubId: info.sub,
+			slackId: info.slack_id ?? current[0]?.slackId ?? null,
+			name: current[0]?.name ?? info.name ?? null
+		})
+		.where(eq(users.id, userId));
+
+	return { verified, decision, returnTo: safeReturnTo(returnTo) };
 }
 
 // Only allow same-origin relative paths so returnTo can't be an open redirect.
