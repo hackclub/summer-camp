@@ -44,6 +44,19 @@ const guard: Handle = async ({ event, resolve }) => {
 	if (!isPublic && !event.locals.user) {
 		redirect(303, `/login?next=${encodeURIComponent(path)}`);
 	}
+
+	// First-run onboarding: any logged-in account that hasn't finished it is
+	// walked through the flow before anything else. Onboarding, the identity
+	// step-up it offers, and logout are exempt so the flow can complete.
+	if (
+		event.locals.user &&
+		!event.locals.user.onboarded &&
+		!path.startsWith('/onboarding') &&
+		!path.startsWith('/identity') &&
+		path !== '/logout'
+	) {
+		redirect(303, '/onboarding');
+	}
 	return resolve(event);
 };
 

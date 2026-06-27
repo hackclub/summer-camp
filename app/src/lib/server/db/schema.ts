@@ -26,6 +26,9 @@ export const users = pgTable('users', {
 		.notNull()
 		.default('camper'),
 	banned: boolean('banned').notNull().default(false),
+	// Set when a camper finishes the first-run onboarding flow. Null = brand-new
+	// account that still needs to be walked through it.
+	onboardedAt: timestamp('onboarded_at', { withTimezone: true }),
 	createdAt: createdAt()
 });
 

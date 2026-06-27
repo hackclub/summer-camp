@@ -64,7 +64,8 @@ export async function validateSession(
 			email: row.user.email,
 			name: row.user.name,
 			role: row.user.role,
-			identityVerified: row.user.identityVerified
+			identityVerified: row.user.identityVerified,
+			onboarded: !!row.user.onboardedAt
 		}
 	};
 }

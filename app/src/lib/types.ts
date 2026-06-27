@@ -5,6 +5,7 @@ export interface SessionUser {
 	name: string | null;
 	role: 'camper' | 'admin';
 	identityVerified: boolean;
+	onboarded: boolean;
 }
 
 export interface Address {
