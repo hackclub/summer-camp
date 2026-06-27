@@ -4,8 +4,8 @@
 	import { CalendarDays, Hammer, Rocket, Gift } from 'lucide-svelte';
 
 	const steps = [
-		{ icon: CalendarDays, title: 'Show up', desc: 'Join the daily workshops — every hour you spend earns you points.' },
-		{ icon: Hammer, title: 'Build something', desc: "Make a project from what you learned. It can be small — just make it yours." },
+		{ icon: CalendarDays, title: 'Show up', desc: 'Join the daily sessions on Zoom. Every hour you spend earns you points!' },
+		{ icon: Hammer, title: 'Build something', desc: "During the call, you'll be guided through how to make a project based on that theme. It can be small, just make it unique :)" },
 		{ icon: Rocket, title: 'Ship it', desc: 'Send it off for review. When it’s approved, you get a points bonus.' },
 		{ icon: Gift, title: 'Spend your points', desc: 'Trade them for real prizes in the camp shop.' }
 	];

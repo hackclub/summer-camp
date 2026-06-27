@@ -19,8 +19,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'Please enter your name (up to 80 characters).', name });
 		}
 		await db.update(users).set({ name }).where(eq(users.id, user.id));
-		// Name saved — on to the last step. (Identity is optional here; it's also
-		// gated later at ship/shop, so we don't block on it.)
-		redirect(303, '/onboarding/start');
+		// Name saved — on to the identity step.
+		redirect(303, '/onboarding/verify');
 	}
 };

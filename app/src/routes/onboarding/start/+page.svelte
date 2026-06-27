@@ -39,5 +39,5 @@
 </div>
 
 <div class="mt-6 text-center">
-	<a href="/onboarding/setup" class="text-sm font-bold text-wood underline">← back</a>
+	<a href="/onboarding/verify" class="text-sm font-bold text-wood underline">← back</a>
 </div>
