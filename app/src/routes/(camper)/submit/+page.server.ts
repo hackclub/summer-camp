@@ -1,14 +1,15 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { campDays, projects, users, type Project } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/auth/guards';
 import { newId } from '$lib/server/ids';
-import { flattenErrors, projectSchema, shipSchema } from '$lib/server/validation';
+import { addressSchema, flattenErrors, projectSchema, shipSchema } from '$lib/server/validation';
 import { openLessons } from '$lib/server/lessons';
 import { shipProject } from '$lib/server/ship';
 import { etDayLabel, type CampDayLite } from '$lib/camp-time';
+import type { Address } from '$lib/types';
 import { env } from '$env/dynamic/private';
 
 function loadDays(): Promise<CampDayLite[]> {
@@ -38,6 +39,22 @@ export const load: PageServerLoad = async (event) => {
 	const user = requireUser(event);
 	const open = openLessons(new Date(), await loadDays());
 
+	// Reward info (points + prize) for the open days, and a prior address to
+	// prefill the (always-required) ship address.
+	const meta = open.length
+		? await db
+				.select({ id: campDays.id, rewardPoints: campDays.rewardPoints, prizeLabel: campDays.prizeLabel })
+				.from(campDays)
+				.where(inArray(campDays.id, open.map((d) => d.id)))
+		: [];
+	const metaById = new Map(meta.map((m) => [m.id, m]));
+	const [lastAddr] = await db
+		.select({ a: projects.shipAddress })
+		.from(projects)
+		.where(and(eq(projects.userId, user.id), isNotNull(projects.shipAddress)))
+		.orderBy(desc(projects.updatedAt))
+		.limit(1);
+
 	const lessons = await Promise.all(
 		open.map(async (day) => {
 			const [project] = await projectFor(user.id, day.id);
@@ -51,9 +68,16 @@ export const load: PageServerLoad = async (event) => {
 					})
 				: null;
 			return {
-				day: { id: day.id, title: day.title, label: etDayLabel(day.date) },
+				day: {
+					id: day.id,
+					title: day.title,
+					label: etDayLabel(day.date),
+					rewardPoints: metaById.get(day.id)?.rewardPoints ?? 0,
+					prizeLabel: metaById.get(day.id)?.prizeLabel ?? null
+				},
 				project: project ?? null,
 				shipped: project ? shippedStatuses.has(project.status) : false,
+				address: project?.shipAddress ?? lastAddr?.a ?? null,
 				missing: check && !check.success ? flattenErrors(check.error) : {}
 			};
 		})
@@ -74,7 +98,8 @@ async function resolveOpenDay(campDayId: string | undefined) {
 async function upsertLessonProject(
 	userId: string,
 	campDayId: string,
-	data: { title: string; description: string; githubUrl: string; playableUrl: string; screenshotUrl: string }
+	data: { title: string; description: string; githubUrl: string; playableUrl: string; screenshotUrl: string },
+	shipAddress?: Address
 ): Promise<Project> {
 	const fields = {
 		title: data.title,
@@ -82,6 +107,7 @@ async function upsertLessonProject(
 		githubUrl: data.githubUrl || null,
 		playableUrl: data.playableUrl || null,
 		screenshotUrl: data.screenshotUrl || null,
+		...(shipAddress ? { shipAddress } : {}),
 		updatedAt: new Date()
 	};
 	const [existing] = await projectFor(userId, campDayId);
@@ -96,7 +122,7 @@ async function upsertLessonProject(
 }
 
 export const actions: Actions = {
-	// Save a draft for an open lesson without shipping.
+	// Save a draft for an open lesson without shipping (no address required yet).
 	save: async (event) => {
 		const user = requireUser(event);
 		const form = await event.request.formData();
@@ -111,7 +137,7 @@ export const actions: Actions = {
 		return { campDayId, saved: true };
 	},
 
-	// Save the latest fields, then ship the lesson's project for review.
+	// Save the latest fields + address, then ship the lesson's project for review.
 	ship: async (event) => {
 		const user = requireUser(event);
 		const form = await event.request.formData();
@@ -119,11 +145,21 @@ export const actions: Actions = {
 		const day = await resolveOpenDay(campDayId);
 		if (!day) return fail(400, { campDayId, closed: true });
 
-		// Save whatever they have so nothing is lost even if shipping is blocked.
-		const draft = projectSchema.safeParse(Object.fromEntries(form));
-		if (!draft.success) return fail(400, { campDayId, errors: flattenErrors(draft.error) });
-		const project = await upsertLessonProject(user.id, day.id, draft.data);
+		const data = Object.fromEntries(form);
+		const draft = projectSchema.safeParse(data);
+		// Address is always required to ship — Unified YSWS needs it to mail prizes.
+		const addr = addressSchema.safeParse(data);
+		if (!draft.success || !addr.success) {
+			return fail(400, {
+				campDayId,
+				errors: {
+					...(draft.success ? {} : flattenErrors(draft.error)),
+					...(addr.success ? {} : flattenErrors(addr.error))
+				}
+			});
+		}
 
+		const project = await upsertLessonProject(user.id, day.id, draft.data, addr.data);
 		if (shippedStatuses.has(project.status)) return fail(400, { campDayId, alreadyShipped: true });
 
 		const check = shipSchema.safeParse({

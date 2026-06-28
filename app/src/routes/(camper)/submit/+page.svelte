@@ -6,6 +6,7 @@
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import ProjectForm from '$lib/components/projects/ProjectForm.svelte';
+	import AddressFields from '$lib/components/projects/AddressFields.svelte';
 
 	let { data, form } = $props();
 
@@ -32,7 +33,17 @@
 	{:else}
 		{#each data.lessons as lesson (lesson.day.id)}
 			<Card title={lesson.day.title}>
-				<p class="mb-4 text-sm font-bold text-wood">{lesson.day.label}</p>
+				<p class="text-sm font-bold text-wood">{lesson.day.label}</p>
+				{#if lesson.day.rewardPoints > 0 || lesson.day.prizeLabel}
+					<p class="mb-4 text-sm text-grass-dark">
+						Approved gets you
+						{#if lesson.day.rewardPoints > 0}<strong>+{lesson.day.rewardPoints} pts</strong>{/if}{#if lesson.day.rewardPoints > 0 && lesson.day.prizeLabel}
+							and{/if}{#if lesson.day.prizeLabel}
+							the prize <strong>{lesson.day.prizeLabel}</strong>{/if}.
+					</p>
+				{:else}
+					<div class="mb-4"></div>
+				{/if}
 
 				{#if lesson.shipped}
 					<div class="flex items-center gap-3">
@@ -65,6 +76,15 @@
 							errors={errorsFor(lesson.day.id)}
 							hideSubmit
 						/>
+
+						<div class="mt-4">
+							<p class="mb-2 font-bold text-wood-dark">Mailing address</p>
+							<p class="mb-3 text-sm text-wood-dark/70">
+								Required to ship — Hack Club needs it to send anything you earn.
+							</p>
+							<AddressFields address={lesson.address} errors={errorsFor(lesson.day.id)} />
+						</div>
+
 						{#if !data.identityVerified}
 							<p class="mt-4 text-sm text-wood-dark/70">
 								You'll verify your identity when you submit (needed before we can mail prizes).

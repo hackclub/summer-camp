@@ -1,8 +1,23 @@
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { projects, type Project, type User } from '$lib/server/db/schema';
+import { campDays, projects, type Project, type User } from '$lib/server/db/schema';
 import { ariConfigured, buildShipPayload, ingestShip } from '$lib/server/ari';
 import { createSubmissionRecord } from '$lib/server/airtable-ships';
+import { notifyShipReceived } from '$lib/server/notify';
+
+const DEFAULT_DAY_HOURS = 3;
+
+/** Hours credited for a project's camp day (logged to Ari), defaulting when the
+ *  project isn't tied to a day or the day has no value. */
+async function campDayHoursFor(project: Project): Promise<number> {
+	if (!project.campDayId) return DEFAULT_DAY_HOURS;
+	const [day] = await db
+		.select({ hours: campDays.hours })
+		.from(campDays)
+		.where(eq(campDays.id, project.campDayId))
+		.limit(1);
+	return day?.hours != null ? Number(day.hours) : DEFAULT_DAY_HOURS;
+}
 
 export type ShipOutcome = { ok: true } | { ok: false };
 
@@ -43,8 +58,12 @@ export async function shipProject(
 			.where(eq(projects.id, project.id));
 	}
 
-	// 2) Ingest to Ari; any non-2xx blocks the ship.
-	const result = await ingestShip(buildShipPayload({ ...project, airtableRecordId: recordId }, maker, origin));
+	// 2) Ingest to Ari; any non-2xx blocks the ship. Time is the camp day's hours,
+	//    logged as a journal entry (no Hackatime).
+	const hours = await campDayHoursFor(project);
+	const result = await ingestShip(
+		buildShipPayload({ ...project, airtableRecordId: recordId }, maker, origin, hours)
+	);
 	if (!result.ok) {
 		const msg = `ingest ${result.status}: ${result.body.slice(0, 500)}`;
 		console.error('[ari] ingest failed:', msg);
@@ -61,10 +80,16 @@ export async function shipProject(
 		.set({
 			status: 'submitted',
 			shippedAt: new Date(),
+			loggedHours: hours.toString(),
 			ariStatus: 'queued',
 			ariError: null,
 			updatedAt: new Date()
 		})
 		.where(eq(projects.id, project.id));
+
+	await notifyShipReceived(
+		{ email: maker.email, slackId: maker.slackId, name: maker.name },
+		project.title
+	);
 	return { ok: true };
 }

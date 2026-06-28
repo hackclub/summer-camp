@@ -47,6 +47,16 @@ export async function createSubmissionRecord(project: Project, user: User): Prom
 		// server-populated Attachment shape, hence the cast (same as airtable.ts).
 		fields.Screenshot = [{ url: project.screenshotUrl }] as unknown as Airtable.Attachment[];
 	}
+	// Mailing address (captured at ship time) — Unified YSWS needs it to send prizes.
+	const addr = project.shipAddress;
+	if (addr) {
+		fields['Address (Line 1)'] = addr.line1 ?? '';
+		fields['Address (Line 2)'] = addr.line2 ?? '';
+		fields['City'] = addr.city ?? '';
+		fields['State / Province'] = addr.state ?? '';
+		fields['ZIP / Postal Code'] = addr.zip ?? '';
+		fields['Country'] = addr.country ?? '';
+	}
 
 	const created = await t.create([{ fields }]);
 	return created[0].id;

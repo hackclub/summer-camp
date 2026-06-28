@@ -68,6 +68,14 @@ export const campDays = pgTable('camp_days', {
 	joinUrl: text('join_url'),
 	recordingUrl: text('recording_url'),
 	published: boolean('published').notNull().default(false),
+	// Hours credited for a project shipped against this day — logged to Ari as a
+	// single journal entry of (hours × 60) minutes, which satisfies Ari's time
+	// requirement without Hackatime.
+	hours: numeric('hours', { precision: 4, scale: 2 }).notNull().default('3'),
+	// Reward for getting this day's project approved: points awarded to the camper
+	// and an optional free-text prize dropped into the fulfillment queue.
+	rewardPoints: integer('reward_points').notNull().default(0),
+	prizeLabel: text('prize_label'), // null = no physical prize for this day
 	createdAt: createdAt()
 });
 
@@ -128,10 +136,20 @@ export const projects = pgTable(
 		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 		airtableRecordId: text('airtable_record_id'),
 		syncedAt: timestamp('synced_at', { withTimezone: true }),
-		// Hackatime project keys for this ship, comma-separated. Ari requires at
-		// least one of these (or journals) or it 422s the ingest. TODO: capture
-		// this from the camper on the ship form; for now it's null and shipping is
-		// blocked until populated (which is the intended "contact Jenin" gate).
+		// Shipping address captured at ship time when the project's camp day has a
+		// prize, so the prize grant on Ari approval has somewhere to mail it.
+		shipAddress: jsonb('ship_address').$type<{
+			line1: string;
+			line2?: string;
+			city: string;
+			state: string;
+			zip: string;
+			country: string;
+		} | null>(),
+		// Hours logged to Ari for this ship (snapshot of the camp day's hours).
+		loggedHours: numeric('logged_hours', { precision: 4, scale: 2 }),
+		// Legacy Hackatime keys (unused — time now comes from the camp day's hours
+		// sent to Ari as a journal entry). Kept to avoid a column drop.
 		hackatimeProjects: text('hackatime_projects'),
 		// Ari review state. ariId is Ari's own submission id (AR-####), set when a
 		// decision webhook arrives. ariStatus tracks the last known Ari state and

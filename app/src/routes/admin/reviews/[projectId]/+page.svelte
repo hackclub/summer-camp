@@ -48,8 +48,10 @@
 			<h2 class="mb-2 font-bold text-slate-800">Review status</h2>
 			<p class="mb-3 text-slate-600">
 				Reviews are handled by <strong>Ari</strong>. Decisions arrive automatically and update the
-				status below — there's nothing to approve here. Approval awards +{data.shipBonus} pts and pushes
-				the record to the Unified YSWS DB.
+				status below — there's nothing to approve here. Approval awards
+				{data.rewardPoints > 0 ? `+${data.rewardPoints} pts` : 'no points'}{data.prizeLabel
+					? ` + the prize "${data.prizeLabel}"`
+					: ''} and pushes the record to the Unified YSWS DB.
 			</p>
 			<dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
 				<dt class="text-slate-500">Status</dt>

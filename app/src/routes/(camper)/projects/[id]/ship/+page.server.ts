@@ -4,7 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { projects, users } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/auth/guards';
-import { flattenErrors, shipSchema } from '$lib/server/validation';
+import { addressSchema, flattenErrors, shipSchema } from '$lib/server/validation';
 import { shipProject } from '$lib/server/ship';
 import { env } from '$env/dynamic/private';
 
@@ -56,7 +56,16 @@ export const actions: Actions = {
 			playableUrl: project.playableUrl ?? '',
 			screenshotUrl: project.screenshotUrl ?? ''
 		});
-		if (!check.success) return fail(400, { errors: flattenErrors(check.error) });
+		// Address is always required to ship — Unified YSWS needs it to mail prizes.
+		const addr = addressSchema.safeParse(Object.fromEntries(await event.request.formData()));
+		if (!check.success || !addr.success) {
+			return fail(400, {
+				errors: {
+					...(check.success ? {} : flattenErrors(check.error)),
+					...(addr.success ? {} : flattenErrors(addr.error))
+				}
+			});
+		}
 
 		// The IDV step-up gate: shipping is the first moment verification matters.
 		if (!user.identityVerified) {
@@ -69,7 +78,16 @@ export const actions: Actions = {
 		const [maker] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
 		if (!maker) error(500, 'User record not found');
 
-		const outcome = await shipProject(project, maker, env.ORIGIN ?? event.url.origin);
+		await db
+			.update(projects)
+			.set({ shipAddress: addr.data, updatedAt: new Date() })
+			.where(eq(projects.id, project.id));
+
+		const outcome = await shipProject(
+			{ ...project, shipAddress: addr.data },
+			maker,
+			env.ORIGIN ?? event.url.origin
+		);
 		if (!outcome.ok) return fail(502, { shipFailed: true });
 		redirect(303, `/projects/${project.id}/edit`);
 	}

@@ -1,14 +1,30 @@
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
-import { projects } from '$lib/server/db/schema';
-import { awardShipBonus } from '$lib/server/points';
+import { campDays, projects, users } from '$lib/server/db/schema';
+import { awardShipReward } from '$lib/server/points';
 import { verifyWebhook, type AriWebhook } from '$lib/server/ari';
 import { markApproved, markRejected } from '$lib/server/airtable-ships';
+import {
+	notifyReviewApproved,
+	notifyReviewChanges,
+	notifyReviewRejected,
+	type Recipient
+} from '$lib/server/notify';
+
+// New project status per decision event (fraud is informational, no change).
+const NEW_STATUS: Record<string, 'approved' | 'rejected' | 'building' | 'submitted'> = {
+	'review.approved': 'approved',
+	'review.rejected': 'rejected',
+	'review.changes': 'building',
+	'review.reverted': 'submitted',
+	'review.requeued': 'submitted'
+};
 
 // Inbound decision webhook from Ari. Every delivery is signed; we verify before
-// trusting it, then drive the project's status + the Airtable checkboxes. All
-// effects are idempotent so Ari's retries are safe.
+// trusting it, then drive the project's status, the camp-day reward, the Airtable
+// checkboxes, and the camper notification. A status-change guard makes Ari's
+// retries (which re-deliver the same event) no-ops.
 export const POST: RequestHandler = async (event) => {
 	const rawBody = await event.request.text();
 	const ok = verifyWebhook({
@@ -38,51 +54,62 @@ export const POST: RequestHandler = async (event) => {
 		return new Response('ok', { status: 200 });
 	}
 
+	if (payload.event === 'review.fraud') {
+		console.log(`[ari] fraud relay for ${project.id}`);
+		return new Response('ok', { status: 200 });
+	}
+
+	const newStatus = NEW_STATUS[payload.event];
+	if (!newStatus) {
+		console.warn(`[ari] unhandled event ${payload.event} for ${project.id}`);
+		return new Response('ok', { status: 200 });
+	}
+
+	// Re-delivery guard: same outcome already applied → ack without side effects.
+	if (project.status === newStatus) return new Response('ok', { status: 200 });
+
 	const recordId = project.airtableRecordId;
+	const note = payload.review?.note_to_maker;
+	const [maker] = await db.select().from(users).where(eq(users.id, project.userId)).limit(1);
+	const to: Recipient | null = maker
+		? { email: maker.email, slackId: maker.slackId, name: maker.name }
+		: null;
+
+	await db
+		.update(projects)
+		.set({ status: newStatus, ariStatus: payload.decision ?? 'queued', ariId: payload.id, updatedAt: new Date() })
+		.where(eq(projects.id, project.id));
 
 	switch (payload.event) {
 		case 'review.approved': {
-			await db
-				.update(projects)
-				.set({ status: 'approved', ariStatus: 'approved', ariId: payload.id, updatedAt: new Date() })
-				.where(eq(projects.id, project.id));
-			await awardShipBonus(project.userId, project.id, null);
+			// Award the camp day's reward points (idempotent on the project id).
+			let rewardPoints = 0;
+			let prizeLabel: string | null = null;
+			if (project.campDayId) {
+				const [day] = await db
+					.select({ rewardPoints: campDays.rewardPoints, prizeLabel: campDays.prizeLabel })
+					.from(campDays)
+					.where(eq(campDays.id, project.campDayId))
+					.limit(1);
+				rewardPoints = day?.rewardPoints ?? 0;
+				prizeLabel = day?.prizeLabel ?? null;
+			}
+			await awardShipReward(project.userId, project.id, rewardPoints);
+			// TODO(P2): when prizeLabel is set, enqueue a prize order into shopOrders.
 			if (recordId) await markApproved(recordId); // throws -> 500 -> Ari retries
+			if (to) await notifyReviewApproved(to, project.title, rewardPoints, prizeLabel, note);
 			break;
 		}
 		case 'review.rejected': {
-			await db
-				.update(projects)
-				.set({ status: 'rejected', ariStatus: 'rejected', ariId: payload.id, updatedAt: new Date() })
-				.where(eq(projects.id, project.id));
 			if (recordId) await markRejected(recordId);
+			if (to) await notifyReviewRejected(to, project.title, note);
 			break;
 		}
 		case 'review.changes': {
-			// Send it back to building so the camper can fix it and re-ship.
-			await db
-				.update(projects)
-				.set({ status: 'building', ariStatus: 'changes', ariId: payload.id, updatedAt: new Date() })
-				.where(eq(projects.id, project.id));
+			if (to) await notifyReviewChanges(to, project.title, note);
 			break;
 		}
-		case 'review.reverted':
-		case 'review.requeued': {
-			// Decision rolled back; put it back in the queue. We leave the Airtable
-			// checkboxes as-is (a reviewer can untick if needed).
-			await db
-				.update(projects)
-				.set({ status: 'submitted', ariStatus: 'queued', updatedAt: new Date() })
-				.where(eq(projects.id, project.id));
-			break;
-		}
-		case 'review.fraud': {
-			// Informational only (relay mode); nothing to change on the ship.
-			console.log(`[ari] fraud relay for ${project.id}`);
-			break;
-		}
-		default:
-			console.warn(`[ari] unhandled event ${payload.event} for ${project.id}`);
+		// reverted / requeued: status reset above; no notification.
 	}
 
 	return new Response('ok', { status: 200 });

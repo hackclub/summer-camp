@@ -60,6 +60,43 @@
 			class="block w-full rounded border border-slate-300 px-2 py-1"
 		/>
 	</label>
+	<div class="grid grid-cols-3 gap-3">
+		<label class="text-sm text-slate-600">
+			Hours credited
+			<input
+				type="number"
+				name="hours"
+				step="0.5"
+				min="0"
+				value={data.day.hours}
+				class="block w-full rounded border border-slate-300 px-2 py-1"
+			/>
+		</label>
+		<label class="text-sm text-slate-600">
+			Reward points
+			<input
+				type="number"
+				name="rewardPoints"
+				min="0"
+				value={data.day.rewardPoints}
+				class="block w-full rounded border border-slate-300 px-2 py-1"
+			/>
+		</label>
+		<label class="text-sm text-slate-600">
+			Prize (optional)
+			<input
+				type="text"
+				name="prizeLabel"
+				value={data.day.prizeLabel ?? ''}
+				placeholder="e.g. Stickers"
+				class="block w-full rounded border border-slate-300 px-2 py-1"
+			/>
+		</label>
+	</div>
+	<p class="text-xs text-slate-500">
+		Hours are logged to Ari for this day's projects. On approval the camper gets the reward points
+		and, if a prize is set, it's queued for fulfillment.
+	</p>
 	<div>
 		<button
 			type="submit"

@@ -4,8 +4,7 @@ import { pointsTransactions, shopItems, shopOrders } from '$lib/server/db/schema
 import { newId } from '$lib/server/ids';
 import type { Address } from '$lib/types';
 
-export const POINTS_PER_HOUR = 10;
-export const SHIP_BONUS = 50;
+export const POINTS_PER_HOUR = 1;
 
 export async function getBalance(userId: string): Promise<number> {
 	const [{ balance }] = await db
@@ -43,20 +42,23 @@ export async function awardAttendance(
 		});
 }
 
-export async function awardShipBonus(
+/** Award a camp day's ship reward when its project is approved. Idempotent via
+ *  the (kind='ship_bonus', ref_id=projectId) unique index; no-op for 0 points. */
+export async function awardShipReward(
 	userId: string,
 	projectId: string,
-	reviewerId: string | null
+	points: number
 ): Promise<void> {
+	if (points <= 0) return;
 	await db
 		.insert(pointsTransactions)
 		.values({
 			id: newId(),
 			userId,
-			amount: SHIP_BONUS,
+			amount: points,
 			kind: 'ship_bonus',
 			refId: projectId,
-			createdBy: reviewerId
+			createdBy: null
 		})
 		.onConflictDoNothing();
 }

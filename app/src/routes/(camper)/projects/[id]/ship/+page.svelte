@@ -2,6 +2,7 @@
 	import PageHeader from '$lib/components/theme/PageHeader.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import AddressFields from '$lib/components/projects/AddressFields.svelte';
 	import { Check, X } from 'lucide-svelte';
 
 	let { data, form } = $props();
@@ -70,6 +71,13 @@
 					</p>
 				{/if}
 				<form method="POST">
+					<div class="mb-4">
+						<p class="mb-2 font-bold text-wood-dark">Mailing address</p>
+						<p class="mb-3 text-sm text-wood-dark/70">
+							Required to ship — Hack Club needs it to send anything you earn.
+						</p>
+						<AddressFields address={data.project.shipAddress} errors={form?.errors ?? {}} />
+					</div>
 					<Button type="submit" size="lg">Ship it for real 🚀</Button>
 				</form>
 			</Card>

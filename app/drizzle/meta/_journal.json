@@ -36,6 +36,13 @@
       "when": 1781898271651,
       "tag": "0004_add_ysws_check",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781899271651,
+      "tag": "0005_camp_day_rewards",
+      "breakpoints": true
     }
   ]
 }

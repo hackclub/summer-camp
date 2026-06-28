@@ -11,7 +11,11 @@ const updateSchema = z.object({
 	title: z.string().trim().min(1).max(200),
 	description: z.string().trim().max(5000).optional().default(''),
 	joinUrl: z.string().trim().max(2000).optional().default(''),
-	recordingUrl: z.string().trim().max(2000).optional().default('')
+	recordingUrl: z.string().trim().max(2000).optional().default(''),
+	// Hours credited (logged to Ari), and the approval reward: points + optional prize.
+	hours: z.coerce.number().min(0).max(24).optional().default(3),
+	rewardPoints: z.coerce.number().int().min(0).max(100000).optional().default(0),
+	prizeLabel: z.string().trim().max(200).optional().default('')
 });
 
 const materialSchema = z.object({
@@ -44,7 +48,10 @@ export const actions: Actions = {
 				title: parsed.data.title,
 				description: parsed.data.description || null,
 				joinUrl: parsed.data.joinUrl || null,
-				recordingUrl: parsed.data.recordingUrl || null
+				recordingUrl: parsed.data.recordingUrl || null,
+				hours: parsed.data.hours.toString(),
+				rewardPoints: parsed.data.rewardPoints,
+				prizeLabel: parsed.data.prizeLabel || null
 			})
 			.where(eq(campDays.id, event.params.id));
 		return { saved: true };

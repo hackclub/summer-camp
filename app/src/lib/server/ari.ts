@@ -29,6 +29,7 @@ export interface ShipPayload {
 	demo_url?: string;
 	thumbnail_url: string;
 	hackatime_projects?: string[];
+	journals?: { at: string; minutes: number; text: string }[];
 	evidence: string[];
 	meta?: Record<string, string>;
 }
@@ -41,12 +42,21 @@ function githubSlug(url: string | null): string | null {
 }
 
 /** Build the ingest payload from a project + its maker. external_id is the
- *  project id so decision webhooks can be matched straight back to the row. */
-export function buildShipPayload(project: Project, user: User, origin: string): ShipPayload {
+ *  project id so decision webhooks can be matched straight back to the row.
+ *  Time is logged as a single journal entry of (campDayHours × 60) minutes —
+ *  this is how camp satisfies Ari's "hackatime_projects OR journals" rule
+ *  without Hackatime. */
+export function buildShipPayload(
+	project: Project,
+	user: User,
+	origin: string,
+	campDayHours: number
+): ShipPayload {
 	const hackatime = (project.hackatimeProjects ?? '')
 		.split(',')
 		.map((s) => s.trim())
 		.filter(Boolean);
+	const at = (project.shippedAt ?? new Date()).toISOString().slice(0, 10); // YYYY-MM-DD
 
 	const payload: ShipPayload = {
 		external_id: project.id,
@@ -59,6 +69,13 @@ export function buildShipPayload(project: Project, user: User, origin: string): 
 		},
 		repo_url: project.githubUrl ?? '',
 		thumbnail_url: project.screenshotUrl ?? '',
+		journals: [
+			{
+				at,
+				minutes: Math.round(campDayHours * 60),
+				text: project.description || project.title
+			}
+		],
 		evidence: ['commits', 'elapsed', 'devlog'],
 		meta: { 'Project page': `${origin}/projects/${project.id}` }
 	};
@@ -137,4 +154,5 @@ export interface AriWebhook {
 	decision: 'approved' | 'changes' | 'rejected' | null;
 	id: string;
 	external_id: string;
+	review?: { note_to_maker?: string };
 }
