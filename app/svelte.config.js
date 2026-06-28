@@ -22,7 +22,9 @@ const config = {
 					'self',
 					'data:',
 					'https://cdn.hackclub.com',
-					'https://user-cdn.hackclub-assets.com'
+					'https://user-cdn.hackclub-assets.com',
+					// Error pages show the matching cat from http.cat for the status code.
+					'https://http.cat'
 				],
 				'font-src': ['self', 'https://fonts.gstatic.com'],
 				'connect-src': ['self'],
