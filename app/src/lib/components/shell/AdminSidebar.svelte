@@ -9,7 +9,8 @@
 		{ href: '/admin/announcements', label: 'Announcements' },
 		{ href: '/admin/shop', label: 'Shop items' },
 		{ href: '/admin/orders', label: 'Orders' },
-		{ href: '/admin/campers', label: 'Campers' }
+		{ href: '/admin/campers', label: 'Campers' },
+		{ href: '/admin/stats', label: 'Stats' }
 	];
 
 	const isActive = (href: string) =>

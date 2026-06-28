@@ -205,6 +205,15 @@ export const pointsTransactions = pgTable(
 	]
 );
 
+export const shopCategories = pgTable('shop_categories', {
+	id: id(),
+	name: text('name').notNull(),
+	slug: text('slug').notNull().unique(),
+	description: text('description'),
+	sort: integer('sort').notNull().default(0),
+	createdAt: createdAt()
+});
+
 export const shopItems = pgTable('shop_items', {
 	id: id(),
 	name: text('name').notNull(),
@@ -215,6 +224,7 @@ export const shopItems = pgTable('shop_items', {
 	requiresAddress: boolean('requires_address').notNull().default(true),
 	active: boolean('active').notNull().default(true),
 	sort: integer('sort').notNull().default(0),
+	categoryId: text('category_id').references(() => shopCategories.id, { onDelete: 'set null' }),
 	createdAt: createdAt()
 });
 
@@ -271,6 +281,7 @@ export type CampDayMaterial = typeof campDayMaterials.$inferSelect;
 export type Attendance = typeof attendance.$inferSelect;
 export type Project = typeof projects.$inferSelect;
 export type ProjectReview = typeof projectReviews.$inferSelect;
+export type ShopCategory = typeof shopCategories.$inferSelect;
 export type ShopItem = typeof shopItems.$inferSelect;
 export type ShopOrder = typeof shopOrders.$inferSelect;
 export type Announcement = typeof announcements.$inferSelect;

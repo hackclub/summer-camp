@@ -85,8 +85,39 @@
 				class="block w-24 rounded border border-slate-300 px-2 py-1"
 			/>
 		</label>
+		<label class="text-sm text-slate-600">
+			Category
+			<select name="categoryId" class="block w-full rounded border border-slate-300 px-2 py-1">
+				<option value="">— none —</option>
+				{#each data.categories as c (c.id)}
+					<option value={c.id} selected={item?.categoryId === c.id}>{c.name}</option>
+				{/each}
+			</select>
+		</label>
 	</div>
 {/snippet}
+
+<details class="mb-6 rounded-lg border border-slate-200 bg-white p-4">
+	<summary class="cursor-pointer font-bold text-slate-800">Categories</summary>
+	<div class="mt-3 flex flex-col gap-2">
+		{#each data.categories as c (c.id)}
+			<div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2 last:border-0">
+				<span class="text-sm text-slate-700">{c.name}</span>
+				<form method="POST" action="?/deleteCategory" use:enhance>
+					<input type="hidden" name="id" value={c.id} />
+					<button type="submit" class="text-xs text-red-600 hover:underline">Delete</button>
+				</form>
+			</div>
+		{:else}
+			<p class="text-sm text-slate-500">No categories yet.</p>
+		{/each}
+		<form method="POST" action="?/createCategory" use:enhance class="mt-2 flex flex-wrap items-end gap-2">
+			<input name="name" placeholder="New category name" required class="rounded border border-slate-300 px-2 py-1 text-sm" />
+			<input name="sort" type="number" value="0" class="w-20 rounded border border-slate-300 px-2 py-1 text-sm" />
+			<button type="submit" class="rounded bg-slate-800 px-3 py-1.5 text-sm font-bold text-white hover:bg-slate-700">Add</button>
+		</form>
+	</div>
+</details>
 
 <details class="mb-6 rounded-lg border border-slate-200 bg-white p-4">
 	<summary class="cursor-pointer font-bold text-slate-800">+ New item</summary>
