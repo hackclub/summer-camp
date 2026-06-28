@@ -12,11 +12,13 @@ export const load: PageServerLoad = async (event) => {
 			status: shopOrders.status,
 			pricePoints: shopOrders.pricePoints,
 			createdAt: shopOrders.createdAt,
+			trackingUrl: shopOrders.trackingUrl,
+			prizeLabel: shopOrders.prizeLabel,
 			itemName: shopItems.name,
 			itemImage: shopItems.imageUrl
 		})
 		.from(shopOrders)
-		.innerJoin(shopItems, eq(shopOrders.itemId, shopItems.id))
+		.leftJoin(shopItems, eq(shopOrders.itemId, shopItems.id))
 		.where(eq(shopOrders.userId, user.id))
 		.orderBy(desc(shopOrders.createdAt));
 	return { orders };

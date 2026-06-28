@@ -143,7 +143,8 @@ export async function refundOrder(orderId: string): Promise<void> {
 			})
 			.onConflictDoNothing()
 			.returning({ id: pointsTransactions.id });
-		if (inserted.length > 0) {
+		// Restock only real shop items; prize orders have no item to restock.
+		if (inserted.length > 0 && order.itemId) {
 			await tx
 				.update(shopItems)
 				.set({ stock: sql`${shopItems.stock} + 1` })

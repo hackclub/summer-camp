@@ -38,10 +38,20 @@
 					<div class="size-16 rounded-xl bg-tan"></div>
 				{/if}
 				<div class="flex-1">
-					<h3 class="font-bold text-wood-dark">{order.itemName}</h3>
+					<h3 class="font-bold text-wood-dark">{order.itemName ?? order.prizeLabel ?? 'Order'}</h3>
 					<p class="text-sm text-wood">
-						{order.pricePoints} pts · {new Date(order.createdAt).toLocaleDateString()}
+						{order.pricePoints > 0 ? `${order.pricePoints} pts · ` : ''}{new Date(
+							order.createdAt
+						).toLocaleDateString()}
 					</p>
+					{#if order.trackingUrl}
+						<a
+							href={order.trackingUrl}
+							target="_blank"
+							rel="noopener"
+							class="text-sm font-bold text-wood underline">Track package →</a
+						>
+					{/if}
 				</div>
 				<Badge status={order.status} />
 			</div>

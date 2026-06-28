@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { attendance, campDays, projects, shopOrders, users } from '$lib/server/db/schema';
@@ -20,7 +20,7 @@ export const load: PageServerLoad = async (event) => {
 		db
 			.select({ n: sql<number>`count(*)::int` })
 			.from(shopOrders)
-			.where(eq(shopOrders.status, 'pending')),
+			.where(inArray(shopOrders.status, ['ordered', 'packed', 'shipped'])),
 		(async () => {
 			const [day] = await db
 				.select()

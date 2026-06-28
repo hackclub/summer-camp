@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
-import { campDays, projects, users } from '$lib/server/db/schema';
+import { campDays, projects, shopOrders, users } from '$lib/server/db/schema';
+import { newId } from '$lib/server/ids';
 import { awardShipReward } from '$lib/server/points';
 import { verifyWebhook, type AriWebhook } from '$lib/server/ari';
 import { markApproved, markRejected } from '$lib/server/airtable-ships';
@@ -95,7 +96,22 @@ export const POST: RequestHandler = async (event) => {
 				prizeLabel = day?.prizeLabel ?? null;
 			}
 			await awardShipReward(project.userId, project.id, rewardPoints);
-			// TODO(P2): when prizeLabel is set, enqueue a prize order into shopOrders.
+			// Drop the day's prize into the fulfillment queue (one per project).
+			if (prizeLabel) {
+				await db
+					.insert(shopOrders)
+					.values({
+						id: newId(),
+						userId: project.userId,
+						itemId: null,
+						prizeLabel,
+						sourceProjectId: project.id,
+						pricePoints: 0,
+						status: 'ordered',
+						address: project.shipAddress
+					})
+					.onConflictDoNothing();
+			}
 			if (recordId) await markApproved(recordId); // throws -> 500 -> Ari retries
 			if (to) await notifyReviewApproved(to, project.title, rewardPoints, prizeLabel, note);
 			break;

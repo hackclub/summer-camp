@@ -223,13 +223,20 @@ export const shopOrders = pgTable('shop_orders', {
 	userId: text('user_id')
 		.notNull()
 		.references(() => users.id, { onDelete: 'cascade' }),
-	itemId: text('item_id')
+	// Null for camp-day prize orders (which use prizeLabel instead of a shop item).
+	itemId: text('item_id').references(() => shopItems.id),
+	// Free-text prize for camp-day reward orders; null for normal shop purchases.
+	prizeLabel: text('prize_label'),
+	// The approved project that earned a prize order (unique → one prize per project).
+	sourceProjectId: text('source_project_id').references(() => projects.id),
+	pricePoints: integer('price_points').notNull(), // snapshot at purchase; 0 for prizes
+	status: text('status', {
+		enum: ['ordered', 'packed', 'shipped', 'delivered', 'refunded', 'canceled']
+	})
 		.notNull()
-		.references(() => shopItems.id),
-	pricePoints: integer('price_points').notNull(), // snapshot at purchase
-	status: text('status', { enum: ['pending', 'fulfilled', 'rejected', 'canceled'] })
-		.notNull()
-		.default('pending'),
+		.default('ordered'),
+	trackingUrl: text('tracking_url'),
+	notes: text('notes'),
 	address: jsonb('address').$type<{
 		line1: string;
 		line2?: string;
@@ -239,9 +246,15 @@ export const shopOrders = pgTable('shop_orders', {
 		country: string;
 	} | null>(),
 	createdAt: createdAt(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 	fulfilledBy: text('fulfilled_by').references(() => users.id),
 	fulfilledAt: timestamp('fulfilled_at', { withTimezone: true })
-});
+}, (t) => [
+	// One prize order per approved project (Ari retries are idempotent).
+	uniqueIndex('shop_orders_source_project_idx')
+		.on(t.sourceProjectId)
+		.where(sql`${t.sourceProjectId} IS NOT NULL`)
+]);
 
 export const announcements = pgTable('announcements', {
 	id: id(),
