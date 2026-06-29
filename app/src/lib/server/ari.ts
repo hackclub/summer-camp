@@ -24,7 +24,7 @@ export interface ShipPayload {
 	external_id: string;
 	title: string;
 	description: string;
-	maker: { email: string; name: string; slack_id: string };
+	maker: { email: string; name: string; slack_id: string; program_hours: number };
 	repo_url: string;
 	demo_url?: string;
 	thumbnail_url: string;
@@ -65,7 +65,8 @@ export function buildShipPayload(
 		maker: {
 			email: user.email,
 			name: user.name ?? '',
-			slack_id: user.slackId ?? ''
+			slack_id: user.slackId ?? '',
+			program_hours: campDayHours // hours credited for this ship's camp day
 		},
 		repo_url: project.githubUrl ?? '',
 		thumbnail_url: project.screenshotUrl ?? '',
