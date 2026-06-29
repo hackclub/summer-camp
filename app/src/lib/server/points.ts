@@ -80,6 +80,13 @@ export async function purchase(
 ): Promise<PurchaseResult> {
 	try {
 		return await db.transaction(async (tx) => {
+			// Serialize all balance-mutating work for this user so the debit +
+			// overdraft re-check below can't race a concurrent purchase (TOCTOU):
+			// without this, two concurrent buys each see balance − own_debit ≥ 0 and
+			// both commit. The finite-stock UPDATE only guards finite items; unlimited
+			// stock would otherwise be unprotected. Lock auto-releases at tx end.
+			await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId}))`);
+
 			const [item] = await tx.select().from(shopItems).where(eq(shopItems.id, itemId)).limit(1);
 			if (!item || !item.active) return { ok: false as const, reason: 'unavailable' as const };
 
@@ -132,6 +139,10 @@ export async function refundOrder(orderId: string): Promise<void> {
 	await db.transaction(async (tx) => {
 		const [order] = await tx.select().from(shopOrders).where(eq(shopOrders.id, orderId)).limit(1);
 		if (!order) return;
+		// Same per-user serialization as purchase(), for consistency with the
+		// balance ledger (the refund itself is already idempotent via the unique
+		// (kind='refund', ref_id) index).
+		await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${order.userId}))`);
 		const inserted = await tx
 			.insert(pointsTransactions)
 			.values({
