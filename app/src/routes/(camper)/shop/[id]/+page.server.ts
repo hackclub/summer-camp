@@ -1,4 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { and, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
@@ -34,7 +35,7 @@ export const actions: Actions = {
 
 		// Same bar as shipping: prizes only go to verified campers.
 		if (!user.identityVerified) {
-			redirect(303, `/verify-identity?returnTo=${encodeURIComponent(`/shop/${item.id}`)}`);
+			redirect(303, `${base}/verify-identity?returnTo=${encodeURIComponent(`/shop/${item.id}`)}`);
 		}
 
 		let address = null;
@@ -48,6 +49,6 @@ export const actions: Actions = {
 		const result = await purchase(user.id, item.id, address);
 		if (!result.ok) return fail(400, { reason: result.reason });
 
-		redirect(303, '/orders?placed=1');
+		redirect(303, `${base}/orders?placed=1`);
 	}
 };

@@ -3,6 +3,7 @@
 	import PageHeader from '$lib/components/theme/PageHeader.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 </script>
@@ -22,7 +23,7 @@
 		title="Nothing ordered yet"
 		body="Check out the prize shop — your points are waiting to be spent!"
 		actionLabel="Visit the shop"
-		actionHref="/shop"
+		actionHref={`${base}/shop`}
 	/>
 {:else}
 	<div class="mx-auto flex max-w-2xl flex-col gap-3">

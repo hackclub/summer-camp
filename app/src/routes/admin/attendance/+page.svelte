@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { etDayLabel } from '$lib/camp-time';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 </script>
@@ -21,7 +22,7 @@
 			{#each data.days as day (day.id)}
 				<tr class="border-t border-slate-100 hover:bg-slate-50">
 					<td class="px-4 py-2">
-						<a href={`/admin/attendance/${day.id}`} class="text-blue-600 underline">
+						<a href={`${base}/admin/attendance/${day.id}`} class="text-blue-600 underline">
 							{etDayLabel(day.date)}
 						</a>
 					</td>
@@ -31,7 +32,7 @@
 			{:else}
 				<tr
 					><td colspan="3" class="px-4 py-6 text-center text-slate-500">
-						No camp days yet — <a href="/admin/days" class="text-blue-600 underline">create them</a
+						No camp days yet — <a href="{base}/admin/days" class="text-blue-600 underline">create them</a
 						>.
 					</td></tr
 				>

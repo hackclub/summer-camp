@@ -7,6 +7,19 @@
 
 <h1 class="mb-6 text-2xl font-bold text-slate-800">Stats</h1>
 
+<div class="mb-8 max-w-3xl">
+	<h2 class="mb-3 text-lg font-bold text-slate-800">Signups</h2>
+	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+		{#each data.signups as s (s.label)}
+			<div class="rounded-lg border border-slate-200 bg-white p-4">
+				<p class="text-xs text-slate-500 uppercase">{s.label}</p>
+				<p class="text-3xl font-bold text-slate-800 tabular-nums">{s.value}</p>
+			</div>
+		{/each}
+	</div>
+	<p class="mt-2 text-xs text-slate-400">Tracked in Airtable (RSVP + Funnel tables) by timestamp.</p>
+</div>
+
 <div class="mb-8 max-w-xl">
 	<h2 class="mb-3 text-lg font-bold text-slate-800">Funnel</h2>
 	<div class="flex flex-col gap-2">

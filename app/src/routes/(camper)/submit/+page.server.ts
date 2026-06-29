@@ -1,4 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { and, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
@@ -173,7 +174,7 @@ export const actions: Actions = {
 
 		// IDV step-up gate.
 		if (!user.identityVerified) {
-			redirect(303, `/verify-identity?returnTo=${encodeURIComponent('/submit')}`);
+			redirect(303, `${base}/verify-identity?returnTo=${encodeURIComponent('/submit')}`);
 		}
 
 		const [maker] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
@@ -182,6 +183,6 @@ export const actions: Actions = {
 		const outcome = await shipProject(project, maker, env.ORIGIN ?? event.url.origin);
 		if (!outcome.ok) return fail(502, { campDayId, shipFailed: true });
 
-		redirect(303, '/submit?shipped=1');
+		redirect(303, `${base}/submit?shipped=1`);
 	}
 };

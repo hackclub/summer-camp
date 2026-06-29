@@ -1,4 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { and, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
@@ -17,7 +18,7 @@ export const load: PageServerLoad = async (event) => {
 		.limit(1);
 	if (!project) error(404, 'Project not found');
 	if (project.status === 'submitted' || project.status === 'approved') {
-		redirect(303, `/projects/${project.id}/edit`);
+		redirect(303, `${base}/projects/${project.id}/edit`);
 	}
 
 	// Checklist state for the page: what's missing before shipping is allowed.
@@ -89,6 +90,6 @@ export const actions: Actions = {
 			env.ORIGIN ?? event.url.origin
 		);
 		if (!outcome.ok) return fail(502, { shipFailed: true });
-		redirect(303, `/projects/${project.id}/edit`);
+		redirect(303, `${base}/projects/${project.id}/edit`);
 	}
 };

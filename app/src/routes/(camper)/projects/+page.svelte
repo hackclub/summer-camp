@@ -2,6 +2,7 @@
 	import PageHeader from '$lib/components/theme/PageHeader.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 </script>
@@ -15,13 +16,13 @@
 		title="Nothing shipped yet"
 		body="Projects show up here once you submit them for review. Head to Submit to ship a lesson's project!"
 		actionLabel="Go to Submit"
-		actionHref="/submit"
+		actionHref={`${base}/submit`}
 	/>
 {:else}
 	<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		{#each data.myProjects as project (project.id)}
 			<a
-				href={`/projects/${project.id}/edit`}
+				href={`${base}/projects/${project.id}/edit`}
 				class="rounded-2xl border-4 border-wood bg-cream p-4 transition hover:border-dashed"
 			>
 				{#if project.screenshotUrl}

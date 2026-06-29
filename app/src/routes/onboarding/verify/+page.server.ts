@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
@@ -13,7 +14,7 @@ import {
 export const load: PageServerLoad = async (event) => {
 	const user = requireUser(event);
 	// Step 2 — must have done step 1 (name) first.
-	if (!user.name) redirect(303, '/onboarding/setup');
+	if (!user.name) redirect(303, `${base}/onboarding/setup`);
 
 	const [row] = await db
 		.select({ result: users.yswsCheckResult })

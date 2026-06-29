@@ -1,4 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Actions, PageServerLoad } from './$types';
@@ -81,6 +82,6 @@ export const actions: Actions = {
 	remove: async (event) => {
 		requireAdmin(event);
 		await db.delete(campDays).where(eq(campDays.id, event.params.id));
-		redirect(303, '/admin/days');
+		redirect(303, `${base}/admin/days`);
 	}
 };

@@ -2,6 +2,7 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import PageHeader from '$lib/components/theme/PageHeader.svelte';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 </script>
@@ -32,7 +33,7 @@
 				safe in drafts; ship it once you're verified.
 			</p>
 			<Button
-				href={`/identity/start?returnTo=${encodeURIComponent(data.returnTo)}`}
+				href={`${base}/identity/start?returnTo=${encodeURIComponent(data.returnTo)}`}
 				variant="secondary"
 			>
 				Check again
@@ -44,7 +45,7 @@
 				Verification hit a snag. Try again — and if it keeps happening, email
 				<a href="mailto:camp@hackclub.com" class="underline">camp@hackclub.com</a> and we'll sort it out.
 			</p>
-			<Button href={`/identity/start?returnTo=${encodeURIComponent(data.returnTo)}`}>
+			<Button href={`${base}/identity/start?returnTo=${encodeURIComponent(data.returnTo)}`}>
 				Try again
 			</Button>
 		</Card>
@@ -54,7 +55,7 @@
 				To send you prizes, Hack Club needs to verify you're a real teen. It takes ~2 minutes and
 				you only do it once.
 			</p>
-			<Button href={`/identity/start?returnTo=${encodeURIComponent(data.returnTo)}`} size="lg">
+			<Button href={`${base}/identity/start?returnTo=${encodeURIComponent(data.returnTo)}`} size="lg">
 				Verify with Hack Club Identity
 			</Button>
 		</Card>

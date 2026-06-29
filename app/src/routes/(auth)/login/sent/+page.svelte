@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Card from '$lib/components/ui/Card.svelte';
 	import { Mail } from 'lucide-svelte';
+	import { base } from '$app/paths';
 </script>
 
 <svelte:head><title>Check your email — Hack Club Summer Camp</title></svelte:head>
@@ -12,6 +13,6 @@
 		If that address is good, a login link is on its way. It works once and expires in 15 minutes.
 	</p>
 	<p class="text-sm text-wood-dark">
-		Nothing arriving? Check spam, or <a href="/login" class="underline">try again</a>.
+		Nothing arriving? Check spam, or <a href="{base}/login" class="underline">try again</a>.
 	</p>
 </Card>

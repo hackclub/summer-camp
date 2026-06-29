@@ -1,4 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { and, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
@@ -58,6 +59,6 @@ export const actions: Actions = {
 			return fail(400, { locked: true });
 		}
 		await db.delete(projects).where(eq(projects.id, project.id));
-		redirect(303, '/projects');
+		redirect(303, `${base}/projects`);
 	}
 };

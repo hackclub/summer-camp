@@ -2,6 +2,7 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import Textarea from '$lib/components/ui/Textarea.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { base } from '$app/paths';
 
 	interface ProjectFields {
 		title?: string | null;
@@ -40,7 +41,7 @@
 		try {
 			const body = new FormData();
 			body.append('file', file);
-			const res = await fetch('/api/upload', { method: 'POST', body });
+			const res = await fetch(`${base}/api/upload`, { method: 'POST', body });
 			if (!res.ok) throw new Error(await res.text());
 			const { url } = (await res.json()) as { url: string };
 			screenshotUrl = url;

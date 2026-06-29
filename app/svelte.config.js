@@ -9,6 +9,7 @@ const config = {
 	kit: {
 		// adapter-node builds a standalone Node server (build/index.js) for self-hosting (e.g. Docker).
 		adapter: adapter(),
+		paths: { base: '/dash' },
 		csp: {
 			directives: {
 				'default-src': ['self'],

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { etDayLabel } from '$lib/camp-time';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 
@@ -17,7 +18,7 @@
 <div class="grid gap-4 sm:grid-cols-3">
 	{#each cards as card (card.label)}
 		<a
-			href={card.href}
+			href={`${base}${card.href}`}
 			class="rounded-lg border border-slate-200 bg-white p-5 hover:border-slate-400"
 		>
 			<p class="text-sm text-slate-500">{card.label}</p>
@@ -32,7 +33,7 @@
 		<p class="text-lg font-bold text-slate-800">{data.today.day.title}</p>
 		<p class="mt-1 text-slate-600">
 			{data.today.entered} attendance {data.today.entered === 1 ? 'entry' : 'entries'} so far —
-			<a href={`/admin/attendance/${data.today.day.id}`} class="text-blue-600 underline">
+			<a href={`${base}/admin/attendance/${data.today.day.id}`} class="text-blue-600 underline">
 				enter hours
 			</a>
 		</p>

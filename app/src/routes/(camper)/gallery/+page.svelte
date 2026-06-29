@@ -2,6 +2,7 @@
 	import PageHeader from '$lib/components/theme/PageHeader.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 
@@ -31,13 +32,13 @@
 			? 'Try a different search?'
 			: 'Projects will appear here once campers start shipping. Yours could be first!'}
 		actionLabel="Submit a project"
-		actionHref="/submit"
+		actionHref={`${base}/submit`}
 	/>
 {:else}
 	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		{#each data.gallery as project (project.id)}
 			<a
-				href={`/gallery/${project.id}`}
+				href={`${base}/gallery/${project.id}`}
 				class="rounded-2xl border-4 border-wood bg-cream p-4 transition hover:border-dashed"
 			>
 				{#if project.screenshotUrl}
@@ -59,7 +60,7 @@
 	<div class="mt-6 flex justify-center gap-3">
 		{#if data.page > 1}
 			<Button
-				href={`/gallery?q=${encodeURIComponent(data.q)}&page=${data.page - 1}`}
+				href={`${base}/gallery?q=${encodeURIComponent(data.q)}&page=${data.page - 1}`}
 				variant="secondary"
 				size="sm"
 			>
@@ -68,7 +69,7 @@
 		{/if}
 		{#if data.hasMore}
 			<Button
-				href={`/gallery?q=${encodeURIComponent(data.q)}&page=${data.page + 1}`}
+				href={`${base}/gallery?q=${encodeURIComponent(data.q)}&page=${data.page + 1}`}
 				variant="secondary"
 				size="sm"
 			>

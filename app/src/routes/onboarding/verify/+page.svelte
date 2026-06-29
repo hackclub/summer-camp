@@ -2,6 +2,7 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { ShieldCheck, Check, X, Clock } from 'lucide-svelte';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 
@@ -58,7 +59,7 @@
 				<h3 class="mb-1 font-bold text-wood-dark">Verification in review</h3>
 				<p class="text-wood-dark">{data.message}</p>
 				<div class="mt-3">
-					<Button href="/identity/start?returnTo=/onboarding/verify" variant="secondary">
+					<Button href={`${base}/identity/start?returnTo=/onboarding/verify`} variant="secondary">
 						Check again
 					</Button>
 				</div>
@@ -70,17 +71,17 @@
 			a project or shop for prizes.
 		</p>
 		<div class="flex flex-wrap items-center gap-4">
-			<Button href="/identity/start?returnTo=/onboarding/verify">
+			<Button href={`${base}/identity/start?returnTo=/onboarding/verify`}>
 				<ShieldCheck class="size-5" /> Verify now
 			</Button>
-			<a href="/onboarding/start" class="text-sm font-bold text-wood underline">Skip for now →</a>
+			<a href="{base}/onboarding/start" class="text-sm font-bold text-wood underline">Skip for now →</a>
 		</div>
 	{/if}
 </Card>
 
 <div class="mt-6 flex items-center justify-between">
-	<a href="/onboarding/setup" class="text-sm font-bold text-wood underline">← back</a>
-	<Button href="/onboarding/start" size="lg">
+	<a href="{base}/onboarding/setup" class="text-sm font-bold text-wood underline">← back</a>
+	<Button href="{base}/onboarding/start" size="lg">
 		{data.identityVerified ? 'Finish →' : 'Continue →'}
 	</Button>
 </div>

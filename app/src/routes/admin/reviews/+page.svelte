@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { base } from '$app/paths';
+
 	let { data } = $props();
 </script>
 
@@ -25,7 +27,7 @@
 				{#each data.queue as item (item.id)}
 					<tr class="border-t border-slate-100 hover:bg-slate-50">
 						<td class="px-4 py-2">
-							<a href={`/admin/reviews/${item.id}`} class="text-blue-600 underline">{item.title}</a>
+							<a href={`${base}/admin/reviews/${item.id}`} class="text-blue-600 underline">{item.title}</a>
 						</td>
 						<td class="px-4 py-2 text-slate-700">{item.camperName ?? item.camperEmail}</td>
 						<td class="px-4 py-2">{item.identityVerified ? '✅' : '❌'}</td>

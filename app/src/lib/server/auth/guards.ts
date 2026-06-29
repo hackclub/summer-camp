@@ -1,9 +1,10 @@
 import { error, redirect, type RequestEvent } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import type { SessionUser } from '$lib/types';
 
 export function requireUser(event: RequestEvent): SessionUser {
 	if (!event.locals.user) {
-		redirect(303, `/login?next=${encodeURIComponent(event.url.pathname)}`);
+		redirect(303, `${base}/login?next=${encodeURIComponent(event.url.pathname)}`);
 	}
 	return event.locals.user;
 }

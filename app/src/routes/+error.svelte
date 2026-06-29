@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { base } from '$app/paths';
 </script>
 
 <svelte:head><title>{page.status} — Hack Club Summer Camp</title></svelte:head>
@@ -15,7 +16,7 @@
 		<p class="text-wood-dark">{page.error.message}</p>
 	{/if}
 	<a
-		href="/"
+		href="{base}/"
 		class="rounded-full border-4 border-grass-dark bg-grass px-5 py-2 font-bold text-cream"
 	>
 		Back to camp

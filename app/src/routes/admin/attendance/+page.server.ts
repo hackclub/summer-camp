@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { asc, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
@@ -12,7 +13,7 @@ export const load: PageServerLoad = async (event) => {
 	// Jump straight to today's grid when there's a session today.
 	const today = etDateString(new Date());
 	const [todayDay] = await db.select().from(campDays).where(eq(campDays.date, today)).limit(1);
-	if (todayDay) redirect(303, `/admin/attendance/${todayDay.id}`);
+	if (todayDay) redirect(303, `${base}/admin/attendance/${todayDay.id}`);
 
 	const days = await db.select().from(campDays).orderBy(asc(campDays.date));
 	const counts = await db.select({ campDayId: attendance.campDayId }).from(attendance);

@@ -7,8 +7,8 @@
 @font-face {
 	font-family: 'Melon Camp';
 	src:
-		url('/fonts/melon-camp.otf') format('opentype'),
-		url('/fonts/melon-camp.ttf') format('truetype');
+		url('/dash/fonts/melon-camp.otf') format('opentype'),
+		url('/dash/fonts/melon-camp.ttf') format('truetype');
 	font-weight: normal;
 	font-style: normal;
 	font-display: swap;

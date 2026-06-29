@@ -3,6 +3,7 @@ import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { attendance, pointsTransactions, projects, shopOrders, users } from '$lib/server/db/schema';
 import { requireAdmin } from '$lib/server/auth/guards';
+import { funnelCounts } from '$lib/server/funnel';
 
 const int = sql<number>`count(*)::int`;
 
@@ -35,7 +36,16 @@ export const load: PageServerLoad = async (event) => {
 		db.select({ status: shopOrders.status, n: int }).from(shopOrders).groupBy(shopOrders.status)
 	]);
 
+	// Airtable-tracked acquisition funnel (timestamps in the RSVP + Funnel tables).
+	const signups = await funnelCounts();
+
 	return {
+		signups: [
+			{ label: "RSVP'd", value: signups.rsvp },
+			{ label: 'Signed up', value: signups.signedUp },
+			{ label: 'Logged in', value: signups.loggedIn },
+			{ label: 'Shipped (day one+)', value: signups.shipped }
+		],
 		funnel: [
 			{ label: 'Campers', value: campers.n },
 			{ label: 'Onboarded', value: onboarded.n },

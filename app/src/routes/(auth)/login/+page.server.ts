@@ -5,6 +5,8 @@ import { createMagicLink } from '$lib/server/auth/magic-link';
 import { sendMagicLink } from '$lib/server/email';
 import { isRateLimited } from '$lib/server/ratelimit';
 import { safeReturnTo } from '$lib/server/auth/oidc';
+import { markSignedUp } from '$lib/server/funnel';
+import { base } from '$app/paths';
 import { env } from '$env/dynamic/private';
 
 const emailSchema = z.string().trim().toLowerCase().max(254).email();
@@ -19,11 +21,14 @@ export const actions: Actions = {
 		const form = await request.formData();
 
 		// Honeypot: hidden field real users never see; pretend success for bots.
-		if (form.get('company')?.toString()) redirect(303, '/login/sent');
+		if (form.get('company')?.toString()) redirect(303, `${base}/login/sent`);
 
 		const parsed = emailSchema.safeParse(form.get('email')?.toString());
 		if (!parsed.success) return fail(400, { invalid: true });
 		const email = parsed.data;
+		// The landing "Sign up" form posts here with source=signup — record the
+		// RSVP + funnel signup for those (not plain returning-user logins).
+		const isSignup = form.get('source')?.toString() === 'signup';
 
 		let ip = 'unknown';
 		try {
@@ -33,11 +38,19 @@ export const actions: Actions = {
 		}
 		if (isRateLimited(ip, 5, 10 * 60 * 1000)) return fail(429, { rateLimited: true });
 
+		if (isSignup) {
+			try {
+				await markSignedUp(email);
+			} catch (e) {
+				console.error('[funnel] signup tracking failed:', e);
+			}
+		}
+
 		const rawToken = await createMagicLink(email, ip);
 		if (rawToken) {
 			const next = safeReturnTo(url.searchParams.get('next'));
 			const origin = env.ORIGIN ?? url.origin;
-			const link = `${origin}/login/verify?token=${rawToken}&next=${encodeURIComponent(next)}`;
+			const link = `${origin}${base}/login/verify?token=${rawToken}&next=${encodeURIComponent(next)}`;
 			try {
 				await sendMagicLink(email, link);
 			} catch (e) {
@@ -47,6 +60,6 @@ export const actions: Actions = {
 		}
 		// Always act like it worked (even when rate-limited per-email) so the
 		// form can't be used to enumerate accounts or probe limits.
-		redirect(303, '/login/sent');
+		redirect(303, `${base}/login/sent`);
 	}
 };

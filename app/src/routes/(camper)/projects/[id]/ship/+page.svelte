@@ -4,6 +4,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import AddressFields from '$lib/components/projects/AddressFields.svelte';
 	import { Check, X } from 'lucide-svelte';
+	import { base } from '$app/paths';
 
 	let { data, form } = $props();
 
@@ -37,7 +38,7 @@
 		</ul>
 		{#if !ready}
 			<div class="mt-4">
-				<Button href={`/projects/${data.project.id}/edit`} variant="secondary">
+				<Button href={`${base}/projects/${data.project.id}/edit`} variant="secondary">
 					Finish it up first
 				</Button>
 			</div>
@@ -52,7 +53,7 @@
 					you only do it once. Your project is saved — we'll bring you right back here.
 				</p>
 				<Button
-					href={`/identity/start?returnTo=${encodeURIComponent(`/projects/${data.project.id}/ship`)}`}
+					href={`${base}/identity/start?returnTo=${encodeURIComponent(`/projects/${data.project.id}/ship`)}`}
 					size="lg"
 				>
 					Verify with Hack Club Identity

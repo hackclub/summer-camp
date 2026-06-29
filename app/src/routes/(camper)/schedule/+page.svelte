@@ -4,6 +4,7 @@
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import { etDateString, etDayLabel } from '$lib/camp-time';
 	import { Check } from 'lucide-svelte';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 
@@ -57,7 +58,7 @@
 				<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
 					{#each week as day (day.id)}
 						<a
-							href={`/schedule/${day.id}`}
+							href={`${base}/schedule/${day.id}`}
 							class={[
 								'rounded-2xl border-4 bg-cream p-4 transition hover:border-dashed',
 								day.date === today ? 'border-grass' : 'border-wood'

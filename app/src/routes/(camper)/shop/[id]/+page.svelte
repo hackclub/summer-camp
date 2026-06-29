@@ -2,6 +2,7 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
+	import { base } from '$app/paths';
 
 	let { data, form } = $props();
 
@@ -55,7 +56,7 @@
 				To send you prizes, Hack Club needs to verify you're a real teen — it takes ~2 minutes,
 				once.
 			</p>
-			<Button href={`/identity/start?returnTo=${encodeURIComponent(`/shop/${data.item.id}`)}`}>
+			<Button href={`${base}/identity/start?returnTo=${encodeURIComponent(`/shop/${data.item.id}`)}`}>
 				Verify with Hack Club Identity
 			</Button>
 		</Card>

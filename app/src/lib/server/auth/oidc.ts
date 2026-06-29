@@ -4,6 +4,7 @@ import type { Cookies } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
 import { env } from '$env/dynamic/private';
+import { base } from '$app/paths';
 import {
 	checkYswsStatus,
 	decideEligibility,
@@ -21,7 +22,7 @@ const SCOPES = 'openid profile email slack_id verification_status';
 const STATE_COOKIE = 'idv_state';
 
 function redirectUri(): string {
-	return env.HCA_REDIRECT_URI ?? `${env.ORIGIN}/identity/callback`;
+	return env.HCA_REDIRECT_URI ?? `${env.ORIGIN}${base}/identity/callback`;
 }
 
 export async function buildAuthorizeRedirect(cookies: Cookies, returnTo: string): Promise<string> {
@@ -124,6 +125,9 @@ export async function handleCallback(
 
 // Only allow same-origin relative paths so returnTo can't be an open redirect.
 export function safeReturnTo(value: string | null | undefined): string {
-	if (!value || !value.startsWith('/') || value.startsWith('//')) return '/';
-	return value;
+	if (!value || !value.startsWith('/') || value.startsWith('//')) return `${base}/`;
+	// Normalize to exactly one base prefix — values arrive with it (from
+	// url.pathname) or without it (hardcoded links), and we must never double it.
+	if (value === base || value.startsWith(`${base}/`)) return value;
+	return `${base}${value}`;
 }

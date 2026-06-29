@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { etDayLabel } from '$lib/camp-time';
+	import { base } from '$app/paths';
 
 	let { data, form } = $props();
 </script>
@@ -72,7 +73,7 @@
 				<tr class="border-t border-slate-100">
 					<td class="px-4 py-2 whitespace-nowrap text-slate-700">{etDayLabel(day.date)}</td>
 					<td class="px-4 py-2">
-						<a href={`/admin/days/${day.id}`} class="text-blue-600 underline">{day.title}</a>
+						<a href={`${base}/admin/days/${day.id}`} class="text-blue-600 underline">{day.title}</a>
 					</td>
 					<td class="px-4 py-2 text-xs text-slate-500">
 						{day.joinUrl ? '📞 call' : '⚠️ no call link'}

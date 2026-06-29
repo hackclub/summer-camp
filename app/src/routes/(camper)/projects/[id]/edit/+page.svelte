@@ -5,6 +5,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import ProjectForm from '$lib/components/projects/ProjectForm.svelte';
+	import { base } from '$app/paths';
 
 	let { data, form } = $props();
 
@@ -42,7 +43,7 @@
 
 	{#if !locked}
 		<div class="flex justify-between">
-			<Button href={`/projects/${data.project.id}/ship`} size="lg">Ship it! 🚀</Button>
+			<Button href={`${base}/projects/${data.project.id}/ship`} size="lg">Ship it! 🚀</Button>
 			<Button variant="danger" size="sm" onclick={() => (deleteOpen = true)}>Delete</Button>
 		</div>
 		<form method="POST" action="?/delete" bind:this={deleteForm} class="hidden"></form>

@@ -4,6 +4,7 @@
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Coins, Rocket } from 'lucide-svelte';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 </script>
@@ -21,7 +22,7 @@
 					{data.toSubmit === 1 ? 'lesson' : 'lessons'} open for submission. Ship what you built before
 					it locks!
 				</p>
-				<Button href="/submit" size="lg">
+				<Button href="{base}/submit" size="lg">
 					<Rocket class="size-5" /> Submit a project
 				</Button>
 			{:else}
@@ -57,7 +58,7 @@
 				Earn points by showing up to camp and shipping projects.
 			</p>
 			<div class="mt-4">
-				<Button href="/shop" variant="secondary" size="sm">Visit the shop</Button>
+				<Button href="{base}/shop" variant="secondary" size="sm">Visit the shop</Button>
 			</div>
 		</Card>
 	</div>
@@ -72,7 +73,7 @@
 			<div class="flex flex-col gap-2">
 				{#each data.myProjects as project (project.id)}
 					<a
-						href={`/projects/${project.id}/edit`}
+						href={`${base}/projects/${project.id}/edit`}
 						class="flex items-center justify-between gap-2 rounded-xl border-2 border-tan p-3 transition hover:border-dashed hover:border-wood"
 					>
 						<span class="font-bold text-wood-dark">{project.title}</span>
@@ -81,7 +82,7 @@
 				{/each}
 			</div>
 			<div class="mt-4">
-				<Button href="/projects" variant="secondary" size="sm">All projects</Button>
+				<Button href="{base}/projects" variant="secondary" size="sm">All projects</Button>
 			</div>
 		{/if}
 	</Card>

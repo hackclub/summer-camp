@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { Address } from '$lib/types';
+	import { base } from '$app/paths';
 
 	let { data } = $props();
 
@@ -23,7 +24,7 @@
 <div class="mb-4 flex items-center justify-between gap-3">
 	<h1 class="text-2xl font-bold text-slate-800">Orders</h1>
 	<a
-		href={`/admin/orders/export${data.status === 'all' ? '' : `?status=${data.status}`}`}
+		href={`${base}/admin/orders/export${data.status === 'all' ? '' : `?status=${data.status}`}`}
 		class="rounded bg-slate-800 px-3 py-1.5 text-sm font-bold text-white hover:bg-slate-700"
 	>
 		Export CSV
@@ -33,7 +34,7 @@
 <div class="mb-4 flex flex-wrap gap-2">
 	{#each tabs as tab (tab)}
 		<a
-			href={`/admin/orders?status=${tab}`}
+			href={`${base}/admin/orders?status=${tab}`}
 			class={[
 				'rounded px-3 py-1 text-sm capitalize',
 				data.status === tab ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100'

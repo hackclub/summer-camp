@@ -1,4 +1,5 @@
 import { building } from '$app/environment';
+import { base } from '$app/paths';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { validateSession } from '$lib/server/auth/session';
@@ -32,17 +33,20 @@ const auth: Handle = async ({ event, resolve }) => {
 // Coarse route guards; per-route loads/actions also call requireUser/requireAdmin
 // for defense in depth.
 const guard: Handle = async ({ event, resolve }) => {
-	const path = event.url.pathname;
+	// url.pathname includes the base ('/dash/...'). Compare on the base-less route,
+	// but redirect to base-prefixed locations.
+	const full = event.url.pathname;
+	const route = base && full.startsWith(base) ? full.slice(base.length) || '/' : full;
 	const isPublic =
-		path === '/login' ||
-		path.startsWith('/login/') ||
-		path.startsWith('/gallery') ||
-		path === '/api/health' ||
-		path === '/api/ari/webhook' ||
-		path === '/robots.txt';
+		route === '/login' ||
+		route.startsWith('/login/') ||
+		route.startsWith('/gallery') ||
+		route === '/api/health' ||
+		route === '/api/ari/webhook' ||
+		route === '/robots.txt';
 
 	if (!isPublic && !event.locals.user) {
-		redirect(303, `/login?next=${encodeURIComponent(path)}`);
+		redirect(303, `${base}/login?next=${encodeURIComponent(full)}`);
 	}
 
 	// First-run onboarding: any logged-in account that hasn't finished it is
@@ -51,11 +55,11 @@ const guard: Handle = async ({ event, resolve }) => {
 	if (
 		event.locals.user &&
 		!event.locals.user.onboarded &&
-		!path.startsWith('/onboarding') &&
-		!path.startsWith('/identity') &&
-		path !== '/logout'
+		!route.startsWith('/onboarding') &&
+		!route.startsWith('/identity') &&
+		route !== '/logout'
 	) {
-		redirect(303, '/onboarding');
+		redirect(303, `${base}/onboarding`);
 	}
 	return resolve(event);
 };

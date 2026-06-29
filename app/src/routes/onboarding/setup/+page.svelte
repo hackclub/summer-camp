@@ -2,6 +2,7 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
+	import { base } from '$app/paths';
 
 	let { data, form } = $props();
 	let name = $state(form?.name ?? data.name ?? '');
@@ -34,5 +35,5 @@
 </Card>
 
 <div class="mt-6 text-center">
-	<a href="/onboarding" class="text-sm font-bold text-wood underline">← back</a>
+	<a href="{base}/onboarding" class="text-sm font-bold text-wood underline">← back</a>
 </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getCampState, etDayLabel, type CampDayLite } from '$lib/camp-time';
+	import { base } from '$app/paths';
 	import Countdown from './Countdown.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
@@ -29,7 +30,7 @@
 				campState.firstDay.date
 			)} at 12:00 PM ET
 		</p>
-		<Button href="/schedule" variant="secondary">Browse the schedule</Button>
+		<Button href="{base}/schedule" variant="secondary">Browse the schedule</Button>
 	{:else if campState.kind === 'pre-session'}
 		<p class="font-bold tracking-wide text-wood-dark uppercase">{etDayLabel(campState.day.date)}</p>
 		<h1 class="font-melon-camp text-3xl text-wood sm:text-5xl">{campState.day.title}</h1>
@@ -37,7 +38,7 @@
 		<p class="text-4xl text-wood-dark sm:text-5xl">
 			<Countdown target={campState.startsAt} {now} />
 		</p>
-		<Button href={`/schedule/${campState.day.id}`} variant="secondary">
+		<Button href={`${base}/schedule/${campState.day.id}`} variant="secondary">
 			Get ready — see today's materials
 		</Button>
 	{:else if campState.kind === 'live'}
@@ -62,7 +63,7 @@
 		{:else}
 			<p class="text-wood-dark">Recording coming soon — check back later.</p>
 		{/if}
-		<a href={`/schedule/${campState.day.id}`} class="text-wood underline">Today's materials</a>
+		<a href={`${base}/schedule/${campState.day.id}`} class="text-wood underline">Today's materials</a>
 		{#if campState.nextDay && campState.nextStartsAt}
 			<p class="text-sm text-wood-dark">
 				Next session: <strong>{campState.nextDay.title}</strong> in
@@ -77,8 +78,8 @@
 		</p>
 		<p class="text-3xl text-wood-dark"><Countdown target={campState.nextStartsAt} {now} /></p>
 		<div class="flex flex-wrap justify-center gap-3">
-			<Button href="/submit" variant="secondary">Submit a project</Button>
-			<Button href="/gallery" variant="secondary">Browse the gallery</Button>
+			<Button href="{base}/submit" variant="secondary">Submit a project</Button>
+			<Button href="{base}/gallery" variant="secondary">Browse the gallery</Button>
 		</div>
 	{:else}
 		<h1 class="font-melon-camp text-3xl text-wood sm:text-4xl">That's a wrap on Summer Camp!</h1>
@@ -87,8 +88,8 @@
 			your points!
 		</p>
 		<div class="flex flex-wrap justify-center gap-3">
-			<Button href="/gallery" variant="secondary">The gallery</Button>
-			<Button href="/shop">Spend your points</Button>
+			<Button href="{base}/gallery" variant="secondary">The gallery</Button>
+			<Button href="{base}/shop">Spend your points</Button>
 		</div>
 	{/if}
 </section>

@@ -4,6 +4,7 @@ import { campDays, projects, type Project, type User } from '$lib/server/db/sche
 import { ariConfigured, buildShipPayload, ingestShip } from '$lib/server/ari';
 import { createSubmissionRecord } from '$lib/server/airtable-ships';
 import { notifyShipReceived } from '$lib/server/notify';
+import { markFirstShip } from '$lib/server/funnel';
 
 const DEFAULT_DAY_HOURS = 3;
 
@@ -91,5 +92,10 @@ export async function shipProject(
 		{ email: maker.email, slackId: maker.slackId, name: maker.name },
 		project.title
 	);
+	try {
+		await markFirstShip(maker.email);
+	} catch (e) {
+		console.error('[funnel] ship tracking failed:', e);
+	}
 	return { ok: true };
 }

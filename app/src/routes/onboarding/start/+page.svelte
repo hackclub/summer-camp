@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Card from '$lib/components/ui/Card.svelte';
 	import { CalendarDays, Hammer, Home } from 'lucide-svelte';
+	import { base } from '$app/paths';
 
 	const options = [
 		{ icon: Home, title: 'Go to my dashboard', desc: 'See today’s session, your points, and your projects.', destination: '/' },
@@ -39,5 +40,5 @@
 </div>
 
 <div class="mt-6 text-center">
-	<a href="/onboarding/verify" class="text-sm font-bold text-wood underline">← back</a>
+	<a href="{base}/onboarding/verify" class="text-sm font-bold text-wood underline">← back</a>
 </div>

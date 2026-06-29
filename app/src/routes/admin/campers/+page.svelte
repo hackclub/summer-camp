@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { base } from '$app/paths';
+
 	let { data } = $props();
 </script>
 
@@ -37,7 +39,7 @@
 			{#each data.campers as camper (camper.id)}
 				<tr class={['border-t border-slate-100 hover:bg-slate-50', camper.banned && 'opacity-50']}>
 					<td class="px-4 py-2">
-						<a href={`/admin/campers/${camper.id}`} class="text-blue-600 underline">
+						<a href={`${base}/admin/campers/${camper.id}`} class="text-blue-600 underline">
 							{camper.name ?? camper.email}
 						</a>
 						{#if camper.name}<span class="ml-1 text-xs text-slate-400">{camper.email}</span>{/if}

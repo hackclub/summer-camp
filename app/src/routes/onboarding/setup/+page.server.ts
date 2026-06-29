@@ -1,4 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
@@ -20,6 +21,6 @@ export const actions: Actions = {
 		}
 		await db.update(users).set({ name }).where(eq(users.id, user.id));
 		// Name saved — on to the identity step.
-		redirect(303, '/onboarding/verify');
+		redirect(303, `${base}/onboarding/verify`);
 	}
 };
