@@ -22,7 +22,7 @@
 	class="w-full shrink-0 border-b border-slate-200 bg-white md:min-h-screen md:w-52 md:border-r md:border-b-0"
 >
 	<div class="p-4">
-		<a href="/admin" class="font-luckiest-guy text-lg text-wood">Camp Admin</a>
+		<a href="/admin" class="font-melon-camp text-lg text-wood">Camp Admin</a>
 	</div>
 	<nav class="flex flex-row flex-wrap gap-1 px-2 pb-2 md:flex-col md:pb-4">
 		{#each links as link (link.href)}

@@ -1,11 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
-
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* Melon Camp — self-hosted display face (not on Google Fonts). otf first for
+   the cleaner outlines, ttf as a fallback. */
+@font-face {
+	font-family: 'Melon Camp';
+	src:
+		url('/fonts/melon-camp.otf') format('opentype'),
+		url('/fonts/melon-camp.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
 @theme {
-	--font-luckiest-guy: 'Luckiest Guy', cursive;
+	--font-melon-camp: 'Melon Camp', cursive;
 
 	/* Camp palette, promoted from the hardcoded hexes on the landing page. */
 	--color-grass: #80b464; /* primary / success / live */

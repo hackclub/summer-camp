@@ -17,7 +17,7 @@
 	]}
 >
 	{#if title}
-		<h2 class="mb-3 font-luckiest-guy text-xl text-wood sm:text-2xl">{title}</h2>
+		<h2 class="mb-3 font-melon-camp text-xl text-wood sm:text-2xl">{title}</h2>
 	{/if}
 	{@render children()}
 </div>

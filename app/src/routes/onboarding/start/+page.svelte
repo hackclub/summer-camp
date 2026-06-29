@@ -11,7 +11,7 @@
 
 <svelte:head><title>You’re all set! — Hack Club Summer Camp</title></svelte:head>
 
-<h1 class="mb-2 text-center font-luckiest-guy text-3xl text-wood-dark sm:text-4xl">
+<h1 class="mb-2 text-center font-melon-camp text-3xl text-wood-dark sm:text-4xl">
 	You’re all set! 🎉
 </h1>
 <p class="mx-auto mb-8 max-w-md text-center text-wood-dark">

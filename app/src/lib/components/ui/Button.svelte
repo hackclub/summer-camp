@@ -33,7 +33,7 @@
 	};
 	const classes = $derived(
 		[
-			'font-luckiest-guy inline-flex items-center justify-center gap-2 rounded-full border-4 text-center transition',
+			'font-melon-camp inline-flex items-center justify-center gap-2 rounded-full border-4 text-center transition',
 			'hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100',
 			variants[variant],
 			sizes[size]

@@ -26,8 +26,8 @@
 	{/if}
 
 	<div class="text-center">
-		<h1 class="font-luckiest-guy text-4xl text-wood">{data.item.name}</h1>
-		<p class="font-luckiest-guy text-2xl text-wood-dark">{data.item.pricePoints} pts</p>
+		<h1 class="font-melon-camp text-4xl text-wood">{data.item.name}</h1>
+		<p class="font-melon-camp text-2xl text-wood-dark">{data.item.pricePoints} pts</p>
 		{#if data.item.stock !== null && data.item.stock > 0 && data.item.stock <= 5}
 			<p class="font-bold text-berry">Only {data.item.stock} left!</p>
 		{/if}

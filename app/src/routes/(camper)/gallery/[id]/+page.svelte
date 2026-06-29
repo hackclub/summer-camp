@@ -29,7 +29,7 @@
 	{/if}
 
 	<div class="text-center">
-		<h1 class="font-luckiest-guy text-4xl text-wood">{data.project.title}</h1>
+		<h1 class="font-melon-camp text-4xl text-wood">{data.project.title}</h1>
 		<p class="text-wood-dark">by {firstName}</p>
 	</div>
 

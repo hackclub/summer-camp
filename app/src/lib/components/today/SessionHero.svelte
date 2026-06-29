@@ -20,7 +20,7 @@
 	class="relative flex min-h-64 flex-col items-center justify-center gap-4 rounded-2xl border-4 border-wood bg-cream p-6 text-center shadow-md sm:p-10"
 >
 	{#if campState.kind === 'before-camp'}
-		<p class="font-luckiest-guy text-2xl text-wood sm:text-3xl">Camp starts in</p>
+		<p class="font-melon-camp text-2xl text-wood sm:text-3xl">Camp starts in</p>
 		<p class="text-4xl text-wood-dark sm:text-6xl">
 			<Countdown target={campState.startsAt} {now} />
 		</p>
@@ -32,8 +32,8 @@
 		<Button href="/schedule" variant="secondary">Browse the schedule</Button>
 	{:else if campState.kind === 'pre-session'}
 		<p class="font-bold tracking-wide text-wood-dark uppercase">{etDayLabel(campState.day.date)}</p>
-		<h1 class="font-luckiest-guy text-3xl text-wood sm:text-5xl">{campState.day.title}</h1>
-		<p class="font-luckiest-guy text-xl text-wood">Starts in</p>
+		<h1 class="font-melon-camp text-3xl text-wood sm:text-5xl">{campState.day.title}</h1>
+		<p class="font-melon-camp text-xl text-wood">Starts in</p>
 		<p class="text-4xl text-wood-dark sm:text-5xl">
 			<Countdown target={campState.startsAt} {now} />
 		</p>
@@ -43,7 +43,7 @@
 	{:else if campState.kind === 'live'}
 		<Badge status="live" />
 		<p class="font-bold tracking-wide text-wood-dark uppercase">{etDayLabel(campState.day.date)}</p>
-		<h1 class="font-luckiest-guy text-3xl text-wood sm:text-5xl">{campState.day.title}</h1>
+		<h1 class="font-melon-camp text-3xl text-wood sm:text-5xl">{campState.day.title}</h1>
 		{#if campState.day.joinUrl}
 			<Button href={campState.day.joinUrl} size="hero" target="_blank" rel="noopener">
 				JOIN TODAY'S SESSION
@@ -54,7 +54,7 @@
 		{/if}
 		<p class="text-wood-dark">Running until 3:00 PM ET</p>
 	{:else if campState.kind === 'post-session'}
-		<h1 class="font-luckiest-guy text-3xl text-wood sm:text-4xl">Today's session has wrapped!</h1>
+		<h1 class="font-melon-camp text-3xl text-wood sm:text-4xl">Today's session has wrapped!</h1>
 		{#if campState.day.recordingUrl}
 			<Button href={campState.day.recordingUrl} size="lg" target="_blank" rel="noopener">
 				Watch the recording
@@ -70,7 +70,7 @@
 			</p>
 		{/if}
 	{:else if campState.kind === 'no-camp-today'}
-		<h1 class="font-luckiest-guy text-3xl text-wood sm:text-4xl">No camp today</h1>
+		<h1 class="font-melon-camp text-3xl text-wood sm:text-4xl">No camp today</h1>
 		<p class="text-wood-dark">
 			Back for <strong>{campState.nextDay.title}</strong> — {etDayLabel(campState.nextDay.date)} at 12:00
 			PM ET
@@ -81,7 +81,7 @@
 			<Button href="/gallery" variant="secondary">Browse the gallery</Button>
 		</div>
 	{:else}
-		<h1 class="font-luckiest-guy text-3xl text-wood sm:text-4xl">That's a wrap on Summer Camp!</h1>
+		<h1 class="font-melon-camp text-3xl text-wood sm:text-4xl">That's a wrap on Summer Camp!</h1>
 		<p class="text-wood-dark">
 			Thanks for an amazing summer. Your projects live on in the gallery — and don't forget to spend
 			your points!

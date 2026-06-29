@@ -10,7 +10,7 @@
 		alt={`HTTP ${page.status}`}
 		class="w-full max-w-sm rounded-2xl border-4 border-wood shadow-md"
 	/>
-	<h1 class="font-luckiest-guy text-4xl text-wood-dark">{page.status}</h1>
+	<h1 class="font-melon-camp text-4xl text-wood-dark">{page.status}</h1>
 	{#if page.error?.message}
 		<p class="text-wood-dark">{page.error.message}</p>
 	{/if}

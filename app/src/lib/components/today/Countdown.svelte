@@ -7,7 +7,7 @@
 	const pad = (n: number) => String(n).padStart(2, '0');
 </script>
 
-<span class="font-luckiest-guy tabular-nums">
+<span class="font-melon-camp tabular-nums">
 	{#if parts.days > 0}{parts.days}d
 	{/if}{pad(parts.hours)}:{pad(parts.minutes)}:{pad(parts.seconds)}
 </span>

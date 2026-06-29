@@ -10,7 +10,7 @@
 <svelte:head><title>Set up — Hack Club Summer Camp</title></svelte:head>
 
 <p class="mb-2 text-center text-sm font-bold tracking-wide text-wood/80">Step 1 of 2</p>
-<h1 class="mb-2 text-center font-luckiest-guy text-3xl text-wood-dark sm:text-4xl">
+<h1 class="mb-2 text-center font-melon-camp text-3xl text-wood-dark sm:text-4xl">
 	What should we call you?
 </h1>
 <p class="mx-auto mb-8 max-w-md text-center text-wood-dark">

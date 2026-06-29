@@ -11,7 +11,7 @@
 
 <div class="flex flex-col items-center gap-6">
 	<Sign type="plank">
-		<span class="font-luckiest-guy text-3xl sm:text-5xl">Welcome back!</span>
+		<span class="font-melon-camp text-3xl sm:text-5xl">Welcome back!</span>
 	</Sign>
 
 	<Card class="w-full">

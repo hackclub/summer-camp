@@ -6,7 +6,7 @@
 
 <div class="mb-6 flex flex-col items-center">
 	<Sign type="plank">
-		<h1 class="font-luckiest-guy text-3xl sm:text-5xl">{title}</h1>
+		<h1 class="font-melon-camp text-3xl sm:text-5xl">{title}</h1>
 	</Sign>
 	{#if subtitle}
 		<p class="mt-2 text-center text-wood-dark">{subtitle}</p>

@@ -20,7 +20,7 @@
 
 <header class="sticky top-0 z-40 border-b-4 border-wood bg-cream/80 backdrop-blur">
 	<div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-2">
-		<a href="/" class="font-luckiest-guy text-xl whitespace-nowrap text-wood sm:text-2xl">
+		<a href="/" class="font-melon-camp text-xl whitespace-nowrap text-wood sm:text-2xl">
 			Summer Camp
 		</a>
 
@@ -29,7 +29,7 @@
 				<a
 					href={link.href}
 					class={[
-						'rounded-full px-3 py-1 font-luckiest-guy transition',
+						'rounded-full px-3 py-1 font-melon-camp transition',
 						isActive(link.href) ? 'bg-grass text-white' : 'text-wood hover:bg-peach'
 					]}
 				>
@@ -50,7 +50,7 @@
 					</button>
 				</form>
 			{:else}
-				<a href="/login" class="font-luckiest-guy text-wood underline">Log in</a>
+				<a href="/login" class="font-melon-camp text-wood underline">Log in</a>
 			{/if}
 		</div>
 	</div>

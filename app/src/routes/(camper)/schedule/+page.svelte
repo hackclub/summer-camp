@@ -53,7 +53,7 @@
 	<div class="flex flex-col gap-8">
 		{#each weeks as week, i (i)}
 			<section>
-				<h2 class="mb-3 font-luckiest-guy text-2xl text-wood">Week {i + 1}</h2>
+				<h2 class="mb-3 font-melon-camp text-2xl text-wood">Week {i + 1}</h2>
 				<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
 					{#each week as day (day.id)}
 						<a

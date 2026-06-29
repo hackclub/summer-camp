@@ -13,13 +13,13 @@ const config = {
 			directives: {
 				'default-src': ['self'],
 				'script-src': ['self'],
-				// Google Fonts: stylesheet from fonts.googleapis.com, files from fonts.gstatic.com.
-				'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
+				'style-src': ['self', 'unsafe-inline'],
 				// Allow any https image: camper screenshots land on the Hack Club CDN
 				// (v4 returns hc-cdn.hl.hackclub.com URLs) and error pages pull from
 				// http.cat — listing every host is brittle, so allow https + data.
 				'img-src': ['self', 'data:', 'https:'],
-				'font-src': ['self', 'https://fonts.gstatic.com'],
+				// Melon Camp is self-hosted under /fonts, so 'self' is all we need.
+				'font-src': ['self'],
 				'connect-src': ['self'],
 				'object-src': ['none'],
 				'base-uri': ['self'],

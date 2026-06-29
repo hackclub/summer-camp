@@ -21,7 +21,7 @@
 <div class="mx-auto flex max-w-2xl flex-col gap-6">
 	<div class="text-center">
 		<p class="font-bold text-wood-dark uppercase">{etDayLabel(data.day.date)} · 12:00–3:00 PM ET</p>
-		<h1 class="font-luckiest-guy text-4xl text-wood">{data.day.title}</h1>
+		<h1 class="font-melon-camp text-4xl text-wood">{data.day.title}</h1>
 	</div>
 
 	{#if joinWindowOpen && data.day.joinUrl}

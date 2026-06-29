@@ -10,7 +10,7 @@
 </script>
 
 <div class="rounded-2xl border-4 border-dashed border-wood bg-cream/60 px-6 py-12 text-center">
-	<h3 class="mb-2 font-luckiest-guy text-2xl text-wood">{title}</h3>
+	<h3 class="mb-2 font-melon-camp text-2xl text-wood">{title}</h3>
 	<p class="mb-6 text-wood-dark">{body}</p>
 	{#if actionLabel && actionHref}
 		<Button href={actionHref}>{actionLabel}</Button>

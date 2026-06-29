@@ -13,7 +13,7 @@
 
 <svelte:head><title>Welcome — Hack Club Summer Camp</title></svelte:head>
 
-<h1 class="mb-3 text-center font-luckiest-guy text-4xl text-wood-dark sm:text-5xl">
+<h1 class="mb-3 text-center font-melon-camp text-4xl text-wood-dark sm:text-5xl">
 	Welcome to Summer Camp!
 </h1>
 <p class="mx-auto mb-8 max-w-md text-center text-lg text-wood-dark">
