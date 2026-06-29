@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
-import { campDays, projects, shopOrders, users } from '$lib/server/db/schema';
+import { campDays, projects, shopOrders, users, webhookDeliveries } from '$lib/server/db/schema';
 import { newId } from '$lib/server/ids';
 import { awardShipReward } from '$lib/server/points';
 import { verifyWebhook, type AriWebhook } from '$lib/server/ari';
@@ -34,6 +34,19 @@ export const POST: RequestHandler = async (event) => {
 		now: Date.now()
 	});
 	if (!ok) return new Response('bad signature', { status: 401 });
+
+	// Replay guard: record the delivery id; a re-sent (already-seen) delivery is
+	// acked without re-running side effects, even within the 5-minute signature
+	// window. (Belt-and-suspenders with the idempotent awards + status guard.)
+	const deliveryId = event.request.headers.get('x-ari-delivery-id');
+	if (deliveryId) {
+		const inserted = await db
+			.insert(webhookDeliveries)
+			.values({ deliveryId })
+			.onConflictDoNothing()
+			.returning({ id: webhookDeliveries.deliveryId });
+		if (inserted.length === 0) return new Response('ok', { status: 200 });
+	}
 
 	let payload: AriWebhook;
 	try {

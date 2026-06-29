@@ -7,12 +7,25 @@ const httpUrl = z
 	.url()
 	.refine((u) => u.startsWith('http://') || u.startsWith('https://'), 'Must be an http(s) URL');
 
+// Screenshots must be files we uploaded to the Hack Club CDN — not an arbitrary
+// URL. Stops a camper pointing the official YSWS screenshot at any host (and the
+// second-order Airtable server-side fetch that follows).
+const cdnUrl = z
+	.string()
+	.trim()
+	.max(2000)
+	.url()
+	.refine(
+		(u) => /^https:\/\/(hc-cdn\.hl\.hackclub\.com|cdn\.hackclub\.com)\//.test(u),
+		'Upload a screenshot instead of pasting a link'
+	);
+
 export const projectSchema = z.object({
 	title: z.string().trim().min(1, 'Give your project a name').max(100),
 	description: z.string().trim().max(2000).optional().default(''),
 	githubUrl: httpUrl.optional().or(z.literal('')),
 	playableUrl: httpUrl.optional().or(z.literal('')),
-	screenshotUrl: httpUrl.optional().or(z.literal(''))
+	screenshotUrl: cdnUrl.optional().or(z.literal(''))
 });
 
 // Shipping has a higher bar than saving a draft: reviewers (and the YSWS
@@ -22,7 +35,7 @@ export const shipSchema = z.object({
 	description: z.string().trim().min(10, 'Tell us a bit about what you built').max(2000),
 	githubUrl: httpUrl,
 	playableUrl: httpUrl,
-	screenshotUrl: httpUrl
+	screenshotUrl: cdnUrl
 });
 
 /** First zod issue per field, keyed by top-level field name — handy shape for

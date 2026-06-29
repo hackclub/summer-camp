@@ -7,7 +7,10 @@ import { requireAdmin } from '$lib/server/auth/guards';
 type OrderStatus = 'ordered' | 'packed' | 'shipped' | 'refunded' | 'canceled';
 
 function cell(v: unknown): string {
-	const s = v == null ? '' : String(v);
+	let s = v == null ? '' : String(v);
+	// Neutralize spreadsheet formula triggers (camper-controlled address fields
+	// land in this CSV; =HYPERLINK/DDE etc. would execute when an admin opens it).
+	if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
 	return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

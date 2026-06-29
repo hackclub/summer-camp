@@ -34,6 +34,18 @@ export const users = pgTable('users', {
 	// account that still needs to be walked through it.
 	onboardedAt: timestamp('onboarded_at', { withTimezone: true }),
 	createdAt: createdAt()
+}, (t) => [
+	// One Hack Club identity can verify at most one camp account (anti-sybil).
+	uniqueIndex('users_hack_club_id_unique')
+		.on(t.hackClubId)
+		.where(sql`${t.hackClubId} is not null`)
+]);
+
+// Inbound Ari decision webhooks: record each delivery id so a captured request
+// can't be replayed within the signature's 5-minute window.
+export const webhookDeliveries = pgTable('webhook_deliveries', {
+	deliveryId: text('delivery_id').primaryKey(),
+	createdAt: createdAt()
 });
 
 export const magicLinkTokens = pgTable(

@@ -36,7 +36,11 @@ export const actions: Actions = {
 		} catch {
 			// No trusted address header configured; fall back to a shared bucket.
 		}
-		if (isRateLimited(ip, 5, 10 * 60 * 1000)) return fail(429, { rateLimited: true });
+		// Key on the email, not the client IP: behind the ingress every request's
+		// socket peer is the proxy, so an IP key collapses to one shared bucket
+		// (login DoS for everyone). The DB-backed per-email cap in createMagicLink
+		// is the durable guard; this is the cheap in-memory brake.
+		if (isRateLimited(`login:${email}`, 5, 10 * 60 * 1000)) return fail(429, { rateLimited: true });
 
 		if (isSignup) {
 			try {

@@ -12,11 +12,15 @@ function safeFilename(name: string, type: string): string {
 	return `${stem}.${ext}`;
 }
 
-export async function uploadToCdn(file: File): Promise<string> {
+export async function uploadToCdn(file: File, contentType: string): Promise<string> {
 	if (!env.CDN_API_KEY) throw new Error('CDN_API_KEY not configured');
 
 	const fd = new FormData();
-	fd.append('file', file, safeFilename(file.name, file.type));
+	// Re-wrap with the server-verified content type (callers sniff magic bytes)
+	// so a spoofed multipart part type can't reach the CDN; the stored extension
+	// is derived from the verified type too.
+	const blob = new Blob([await file.arrayBuffer()], { type: contentType });
+	fd.append('file', blob, safeFilename(file.name, contentType));
 
 	const res = await fetch('https://cdn.hackclub.com/api/v4/upload', {
 		method: 'POST',

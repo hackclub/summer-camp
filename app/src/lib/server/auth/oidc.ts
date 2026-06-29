@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import type { Cookies } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
@@ -106,6 +106,18 @@ export async function handleCallback(
 	}
 	const verified = isEligible(decision);
 
+	// Anti-sybil: one Hack Club identity may verify at most one camp account. If
+	// this sub is already linked to a different user, refuse (also enforced by the
+	// users_hack_club_id_unique index). The callback turns this into an error page.
+	if (info.sub) {
+		const [dupe] = await db
+			.select({ id: users.id })
+			.from(users)
+			.where(and(eq(users.hackClubId, info.sub), ne(users.id, userId)))
+			.limit(1);
+		if (dupe) throw new Error('identity already linked to another account');
+	}
+
 	// Always record the identity linkage + latest check result; only flip
 	// identityVerified when the camper is actually eligible.
 	const current = await db.select().from(users).where(eq(users.id, userId)).limit(1);
@@ -125,7 +137,10 @@ export async function handleCallback(
 
 // Only allow same-origin relative paths so returnTo can't be an open redirect.
 export function safeReturnTo(value: string | null | undefined): string {
-	if (!value || !value.startsWith('/') || value.startsWith('//')) return `${base}/`;
+	// Require a leading "/" followed by a non-slash, non-backslash char. Blocks
+	// "//evil.com" AND "/\evil.com" (browsers normalize "\"→"/" in the authority),
+	// so this can't become an off-site open redirect.
+	if (!value || !/^\/[^/\\]/.test(value)) return `${base}/`;
 	// Normalize to exactly one base prefix — values arrive with it (from
 	// url.pathname) or without it (hardcoded links), and we must never double it.
 	if (value === base || value.startsWith(`${base}/`)) return value;
