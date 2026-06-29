@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import type { Cookies } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
@@ -11,41 +11,24 @@ import {
 	type EligibilityDecision
 } from '$lib/server/auth/eligibility';
 
-// Hack Club Identity step-up. This is NOT a login method — it attaches
-// verification attributes to the already-logged-in (magic link) user, which
-// sidesteps account-merge problems when the Identity email differs from the
-// camper's login email.
-const ISSUER = 'https://auth.hackclub.com';
-const SCOPES = 'openid profile email verification_status';
+// Hack Club Account (HCA) OAuth2 step-up. This is NOT a login method — it
+// attaches verification attributes to the already-logged-in (magic link) user.
+// Plain OAuth2 against the documented HCA endpoints (no OIDC discovery / PKCE).
+const AUTHORIZE_URL = 'https://auth.hackclub.com/oauth/authorize';
+const TOKEN_URL = 'https://auth.hackclub.com/oauth/token';
+const USERINFO_URL = 'https://auth.hackclub.com/oauth/userinfo';
+const SCOPES = 'openid profile email slack_id verification_status';
 const STATE_COOKIE = 'idv_state';
 
-interface OidcEndpoints {
-	authorization_endpoint: string;
-	token_endpoint: string;
-	userinfo_endpoint: string;
-}
-
-let cachedEndpoints: OidcEndpoints | null = null;
-async function discover(): Promise<OidcEndpoints> {
-	if (cachedEndpoints) return cachedEndpoints;
-	const res = await fetch(`${ISSUER}/.well-known/openid-configuration`);
-	if (!res.ok) throw new Error(`OIDC discovery failed: ${res.status}`);
-	cachedEndpoints = (await res.json()) as OidcEndpoints;
-	return cachedEndpoints;
-}
-
 function redirectUri(): string {
-	return `${env.ORIGIN}/identity/callback`;
+	return env.HCA_REDIRECT_URI ?? `${env.ORIGIN}/identity/callback`;
 }
 
 export async function buildAuthorizeRedirect(cookies: Cookies, returnTo: string): Promise<string> {
-	const endpoints = await discover();
 	const state = randomBytes(16).toString('base64url');
-	const verifier = randomBytes(32).toString('base64url');
-	const challenge = createHash('sha256').update(verifier).digest('base64url');
 
-	// State + PKCE verifier + returnTo round-trip through a short-lived cookie.
-	cookies.set(STATE_COOKIE, JSON.stringify({ state, verifier, returnTo }), {
+	// State + returnTo round-trip through a short-lived cookie.
+	cookies.set(STATE_COOKIE, JSON.stringify({ state, returnTo }), {
 		path: '/',
 		httpOnly: true,
 		secure: true,
@@ -55,14 +38,12 @@ export async function buildAuthorizeRedirect(cookies: Cookies, returnTo: string)
 
 	const params = new URLSearchParams({
 		response_type: 'code',
-		client_id: env.HC_OIDC_CLIENT_ID ?? '',
+		client_id: env.HCA_CLIENT_ID ?? '',
 		redirect_uri: redirectUri(),
 		scope: SCOPES,
-		state,
-		code_challenge: challenge,
-		code_challenge_method: 'S256'
+		state
 	});
-	return `${endpoints.authorization_endpoint}?${params}`;
+	return `${AUTHORIZE_URL}?${params}`;
 }
 
 export interface IdentityResult {
@@ -79,37 +60,31 @@ export async function handleCallback(
 	const stashed = cookies.get(STATE_COOKIE);
 	cookies.delete(STATE_COOKIE, { path: '/' });
 	if (!stashed) throw new Error('Missing IDV state cookie');
-	const { state, verifier, returnTo } = JSON.parse(stashed) as {
-		state: string;
-		verifier: string;
-		returnTo: string;
-	};
+	const { state, returnTo } = JSON.parse(stashed) as { state: string; returnTo: string };
 
 	const code = url.searchParams.get('code');
 	if (!code || url.searchParams.get('state') !== state) {
 		throw new Error('IDV state mismatch');
 	}
 
-	const endpoints = await discover();
-	const tokenRes = await fetch(endpoints.token_endpoint, {
+	const tokenRes = await fetch(TOKEN_URL, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		body: new URLSearchParams({
 			grant_type: 'authorization_code',
 			code,
 			redirect_uri: redirectUri(),
-			client_id: env.HC_OIDC_CLIENT_ID ?? '',
-			client_secret: env.HC_OIDC_CLIENT_SECRET ?? '',
-			code_verifier: verifier
+			client_id: env.HCA_CLIENT_ID ?? '',
+			client_secret: env.HCA_CLIENT_SECRET ?? ''
 		})
 	});
-	if (!tokenRes.ok) throw new Error(`OIDC token exchange failed: ${tokenRes.status}`);
+	if (!tokenRes.ok) throw new Error(`HCA token exchange failed: ${tokenRes.status}`);
 	const { access_token } = (await tokenRes.json()) as { access_token: string };
 
-	const userinfoRes = await fetch(endpoints.userinfo_endpoint, {
+	const userinfoRes = await fetch(USERINFO_URL, {
 		headers: { Authorization: `Bearer ${access_token}` }
 	});
-	if (!userinfoRes.ok) throw new Error(`OIDC userinfo failed: ${userinfoRes.status}`);
+	if (!userinfoRes.ok) throw new Error(`HCA userinfo failed: ${userinfoRes.status}`);
 	const info = (await userinfoRes.json()) as {
 		sub: string;
 		name?: string;
@@ -118,7 +93,7 @@ export async function handleCallback(
 	};
 
 	// Eligibility comes from Identity's external check API (keyed by the IDV id),
-	// not the coarse OIDC claim. If the API is unreachable we fall back to the
+	// not the coarse userinfo claim. If the API is unreachable we fall back to the
 	// claim so an outage can't lock everyone out.
 	const checkResult = info.sub ? await checkYswsStatus(info.sub) : null;
 	let decision = decideEligibility(checkResult);
