@@ -2,9 +2,6 @@
 	import { cdn, fallback } from '$lib/cdn';
 	import Grass from '$lib/grass.svelte';
 	import Sign from '$lib/sign.svelte';
-	import { enhance } from '$app/forms';
-
-	let { form } = $props();
 </script>
 
 <main class="relative flex h-fit flex-col items-center overflow-x-hidden overflow-y-hidden">
@@ -27,57 +24,36 @@
 			</p>
 		</Sign>
 
-		{#if form?.success}
-			<p class="mt-4 text-center font-luckiest-guy text-2xl text-black drop-shadow-md">
-				Thanks for RSVPing! See you at camp!
-			</p>
-		{:else}
-			<!-- RSVP Form -->
-			<form
-				method="POST"
-				use:enhance
-				class="flex w-full max-w-md flex-col items-center gap-4 sm:flex-row sm:gap-2"
+		<!-- Sign-up form: posts to the dashboard login, which emails a magic link
+		     and drops the camper straight into the platform. Native POST (no
+		     enhance) so the browser follows the redirect to /dash/login/sent. -->
+		<form
+			method="POST"
+			action="/dash/login"
+			class="flex w-full max-w-md flex-col items-center gap-4 sm:flex-row sm:gap-2"
+		>
+			<!-- Honeypot: hidden from real users; bots that fill it get silently dropped. -->
+			<div class="absolute left-[-9999px]" aria-hidden="true">
+				<label>
+					Company
+					<input type="text" name="company" tabindex="-1" autocomplete="off" />
+				</label>
+			</div>
+			<input type="hidden" name="source" value="signup" />
+			<input
+				type="email"
+				name="email"
+				placeholder="Enter your email..."
+				required
+				class="w-full rounded-xl border-4 border-[#a3523b] bg-[#fecaa5] px-4 py-3 font-luckiest-guy text-lg text-[#a3523b] placeholder-[#e3ad7e] shadow-md focus:ring-4 focus:ring-[#80b464]/50 focus:outline-none"
+			/>
+			<button
+				type="submit"
+				class="w-full rounded-xl border-4 border-[#a3523b] bg-[#80b464] px-8 py-3 font-luckiest-guy text-xl whitespace-nowrap text-white shadow-md transition-transform hover:scale-105 active:scale-95 sm:w-auto"
 			>
-				<!-- Honeypot: hidden from real users; bots that fill it get silently dropped. -->
-				<div class="absolute left-[-9999px]" aria-hidden="true">
-					<label>
-						Company
-						<input type="text" name="company" tabindex="-1" autocomplete="off" />
-					</label>
-				</div>
-				<input
-					type="email"
-					name="email"
-					placeholder="Enter your email..."
-					required
-					class="w-full rounded-xl border-4 border-[#a3523b] bg-[#fecaa5] px-4 py-3 font-luckiest-guy text-lg text-[#a3523b] placeholder-[#e3ad7e] shadow-md focus:ring-4 focus:ring-[#80b464]/50 focus:outline-none"
-				/>
-				<button
-					type="submit"
-					class="w-full rounded-xl border-4 border-[#a3523b] bg-[#80b464] px-8 py-3 font-luckiest-guy text-xl whitespace-nowrap text-white shadow-md transition-transform hover:scale-105 active:scale-95 sm:w-auto"
-				>
-					RSVP
-				</button>
-			</form>
-			{#if form?.missing}
-				<p class="font-luckiest-guy text-xl text-[#a3523b] drop-shadow-md">Email is required!</p>
-			{/if}
-			{#if form?.invalid}
-				<p class="font-luckiest-guy text-xl text-[#a3523b] drop-shadow-md">
-					Please enter a valid email!
-				</p>
-			{/if}
-			{#if form?.rateLimited}
-				<p class="font-luckiest-guy text-xl text-[#a3523b] drop-shadow-md">
-					Whoa, slow down! Try again in a few minutes.
-				</p>
-			{/if}
-			{#if form?.error}
-				<p class="font-luckiest-guy text-xl text-[#a3523b] drop-shadow-md">
-					Something went wrong. Try again!
-				</p>
-			{/if}
-		{/if}
+				Sign up
+			</button>
+		</form>
 	</div>
 
 	<!-- <Plank text="xd" type="plank" /> -->
@@ -123,7 +99,7 @@
 			{/snippet}
 
 			<div class="h-10 sm:h-180"></div>
-			{@render SignAndText('step 1', 'Grab your spot', "RSVP with your email - we'll email you with the info!", true)}
+			{@render SignAndText('step 1', 'Grab your spot', "Sign up with your email — we'll send a magic link to hop straight in!", true)}
 
 			<div class="h-5 sm:h-15"></div>
 			{@render SignAndText('step 2', 'Get started', "It's okay to have no experience - just show up on day one and dive in!", false)}
