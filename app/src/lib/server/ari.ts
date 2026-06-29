@@ -16,8 +16,15 @@ export function ariConfigured(): boolean {
 	return Boolean(env.ARI_PROGRAM_ID && env.ARI_SECRET);
 }
 
-function hmacHex(raw: string): string {
-	return createHmac('sha256', env.ARI_SECRET ?? '').update(raw).digest('hex');
+function hmacHex(raw: string, secret: string): string {
+	return createHmac('sha256', secret).update(raw).digest('hex');
+}
+
+// Ari uses two separate secrets: ARI_SECRET signs our outbound ingest, and a
+// distinct outbound/webhook secret signs Ari's inbound decision webhooks. Fall
+// back to ARI_SECRET if the webhook one isn't set.
+function webhookSecret(): string {
+	return env.ARI_WEBHOOK_SECRET ?? env.ARI_SECRET ?? '';
 }
 
 export interface ShipPayload {
@@ -98,7 +105,7 @@ export async function ingestShip(payload: ShipPayload): Promise<IngestResult> {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'X-Ari-Signature': hmacHex(raw)
+			'X-Ari-Signature': hmacHex(raw, env.ARI_SECRET ?? '')
 		},
 		body: raw
 	});
@@ -113,7 +120,7 @@ export async function withdrawShip(externalId: string): Promise<IngestResult> {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'X-Ari-Signature': hmacHex(raw)
+			'X-Ari-Signature': hmacHex(raw, env.ARI_SECRET ?? '')
 		},
 		body: raw
 	});
@@ -131,13 +138,14 @@ export function verifyWebhook(opts: {
 	now: number;
 }): boolean {
 	const { rawBody, signature, timestamp, deliveryId, now } = opts;
-	if (!signature || !timestamp || !deliveryId || !env.ARI_SECRET) return false;
+	const secret = webhookSecret();
+	if (!signature || !timestamp || !deliveryId || !secret) return false;
 
 	const ts = Number(timestamp);
 	if (!Number.isFinite(ts)) return false;
 	if (Math.abs(now / 1000 - ts) > 5 * 60) return false; // 5-minute replay window
 
-	const expected = hmacHex(`${timestamp}.${deliveryId}.${rawBody}`);
+	const expected = hmacHex(`${timestamp}.${deliveryId}.${rawBody}`, secret);
 	const a = Buffer.from(expected);
 	const b = Buffer.from(signature);
 	return a.length === b.length && timingSafeEqual(a, b);
