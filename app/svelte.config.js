@@ -15,17 +15,10 @@ const config = {
 				'script-src': ['self'],
 				// Google Fonts: stylesheet from fonts.googleapis.com, files from fonts.gstatic.com.
 				'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
-				// Site art + camper-uploaded screenshots live on the Hack Club CDN, which
-				// 302-redirects to user-cdn.hackclub-assets.com — CSP checks every URL in
-				// the redirect chain, so both hosts are needed.
-				'img-src': [
-					'self',
-					'data:',
-					'https://cdn.hackclub.com',
-					'https://user-cdn.hackclub-assets.com',
-					// Error pages show the matching cat from http.cat for the status code.
-					'https://http.cat'
-				],
+				// Allow any https image: camper screenshots land on the Hack Club CDN
+				// (v4 returns hc-cdn.hl.hackclub.com URLs) and error pages pull from
+				// http.cat — listing every host is brittle, so allow https + data.
+				'img-src': ['self', 'data:', 'https:'],
 				'font-src': ['self', 'https://fonts.gstatic.com'],
 				'connect-src': ['self'],
 				'object-src': ['none'],
