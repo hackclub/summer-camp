@@ -1,9 +1,9 @@
-import { queueEmail, type EmailTemplate } from '$lib/server/email';
+import { createEmailRecord } from '$lib/server/email';
 import { sendSlackDM } from '$lib/server/slack';
 
-// Per-event notification fan-out: email (via the Airtable queue) + Slack DM.
-// Everything here is best-effort — callers must not let a notification failure
-// break the underlying action, and each channel is independently guarded.
+// Per-event notification fan-out: an Emails row (with the matching
+// "Loops - summerCamp…" columns) + a Slack DM. Both best-effort — a
+// notification failure must never break the underlying action.
 
 export interface Recipient {
 	email: string;
@@ -12,28 +12,26 @@ export interface Recipient {
 }
 
 async function fanOut(
-	template: EmailTemplate,
 	to: Recipient,
-	vars: Record<string, unknown>,
+	loopsFields: Record<string, unknown>,
 	slackText: string
 ): Promise<void> {
 	try {
-		await queueEmail(template, to.email, vars);
+		await createEmailRecord({ Email: to.email, ...loopsFields });
 	} catch (e) {
-		console.error(`[notify] email ${template} failed:`, e);
+		console.error('[notify] email failed:', e);
 	}
 	try {
 		await sendSlackDM(to.slackId, slackText);
 	} catch (e) {
-		console.error(`[notify] slack ${template} failed:`, e);
+		console.error('[notify] slack failed:', e);
 	}
 }
 
 export function notifyShipReceived(to: Recipient, projectTitle: string) {
 	return fanOut(
-		'ship_confirmation',
 		to,
-		{ projectTitle },
+		{ 'Loops - summerCampShipConfirmed': projectTitle },
 		`📨 We got your project *${projectTitle}* — it's in review. We'll let you know when it's decided!`
 	);
 }
@@ -50,9 +48,13 @@ export function notifyReviewApproved(
 	if (prizeLabel) txt += ` Your prize (*${prizeLabel}*) is headed your way.`;
 	if (note) txt += `\n> ${note}`;
 	return fanOut(
-		'review_approved',
 		to,
-		{ projectTitle, rewardPoints, prizeLabel: prizeLabel ?? '', note: note ?? '' },
+		{
+			'Loops - summerCampReviewApprovedProjectTitle': projectTitle,
+			'Loops - summerCampReviewApprovedRewardPoints': rewardPoints,
+			'Loops - summerCampReviewApprovedPrize': prizeLabel ?? '',
+			'Loops - summerCampReviewApprovedNote': note ?? ''
+		},
 		txt
 	);
 }
@@ -61,13 +63,27 @@ export function notifyReviewChanges(to: Recipient, projectTitle: string, note?: 
 	let txt = `✏️ Your project *${projectTitle}* needs a few changes before it's approved.`;
 	if (note) txt += `\n> ${note}`;
 	txt += `\nMake the changes and ship it again from the Submit page.`;
-	return fanOut('review_changes', to, { projectTitle, note: note ?? '' }, txt);
+	return fanOut(
+		to,
+		{
+			'Loops - summerCampReviewChangesProjectTitle': projectTitle,
+			'Loops - summerCampReviewChangesNote': note ?? ''
+		},
+		txt
+	);
 }
 
 export function notifyReviewRejected(to: Recipient, projectTitle: string, note?: string) {
 	let txt = `Your project *${projectTitle}* wasn't approved.`;
 	if (note) txt += `\n> ${note}`;
-	return fanOut('review_rejected', to, { projectTitle, note: note ?? '' }, txt);
+	return fanOut(
+		to,
+		{
+			'Loops - summerCampReviewRejectedProjectTitle': projectTitle,
+			'Loops - summerCampReviewRejectedNote': note ?? ''
+		},
+		txt
+	);
 }
 
 /** status is one of the notifying order states: packed | shipped | delivered | refunded. */
@@ -77,6 +93,15 @@ export function notifyOrderStatus(
 	status: 'packed' | 'shipped' | 'delivered' | 'refunded',
 	trackingUrl?: string | null
 ) {
+	const fieldsByStatus: Record<typeof status, Record<string, unknown>> = {
+		packed: { 'Loops - summerCampOrderPackedItemName': itemName },
+		shipped: {
+			'Loops - summerCampOrderShippedItemName': itemName,
+			'Loops - summerCampOrderShippedTrackingUrl': trackingUrl ?? ''
+		},
+		delivered: { 'Loops - summerCampOrderDeliveredItemName': itemName },
+		refunded: { 'Loops - summerCampOrderRefundedItemName': itemName }
+	};
 	const lines: Record<typeof status, string> = {
 		packed: `📦 Your order *${itemName}* is packed and ready to ship.`,
 		shipped: `🚚 Your order *${itemName}* has shipped!`,
@@ -85,10 +110,5 @@ export function notifyOrderStatus(
 	};
 	let txt = lines[status];
 	if (status === 'shipped' && trackingUrl) txt += `\nTrack it: ${trackingUrl}`;
-	return fanOut(
-		`order_${status}` as EmailTemplate,
-		to,
-		{ itemName, status, trackingUrl: trackingUrl ?? '' },
-		txt
-	);
+	return fanOut(to, fieldsByStatus[status], txt);
 }
