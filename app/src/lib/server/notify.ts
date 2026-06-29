@@ -1,9 +1,9 @@
 import { createEmailRecord } from '$lib/server/email';
-import { sendSlackDM } from '$lib/server/slack';
 
 // Per-event notification fan-out: an Emails row (with the matching
-// "Loops - summerCamp…" columns) + a Slack DM. Both best-effort — a
-// notification failure must never break the underlying action.
+// "Loops - summerCamp…" columns) carries the real content. Slack DMs are
+// DISABLED for now — re-enable by restoring the sendSlackDM call below (and the
+// import). Best-effort — a notification failure must never break the action.
 
 export interface Recipient {
 	email: string;
@@ -11,29 +11,20 @@ export interface Recipient {
 	name: string | null;
 }
 
-async function fanOut(
-	to: Recipient,
-	loopsFields: Record<string, unknown>,
-	slackText: string
-): Promise<void> {
+async function fanOut(to: Recipient, loopsFields: Record<string, unknown>): Promise<void> {
 	try {
 		await createEmailRecord({ Email: to.email, ...loopsFields });
 	} catch (e) {
 		console.error('[notify] email failed:', e);
 	}
-	try {
-		await sendSlackDM(to.slackId, slackText);
-	} catch (e) {
-		console.error('[notify] slack failed:', e);
-	}
+	// Slack disabled for now — see slack.ts. Restore:
+	//   import { sendSlackDM } from '$lib/server/slack';
+	//   try { await sendSlackDM(to.slackId, 'Hey! You got a notification from the
+	//     Summer Camp team. Check your email!'); } catch (e) { ... }
 }
 
 export function notifyShipReceived(to: Recipient, projectTitle: string) {
-	return fanOut(
-		to,
-		{ 'Loops - summerCampShipConfirmed': projectTitle },
-		`📨 We got your project *${projectTitle}* — it's in review. We'll let you know when it's decided!`
-	);
+	return fanOut(to, { 'Loops - summerCampShipConfirmed': projectTitle });
 }
 
 export function notifyReviewApproved(
@@ -43,54 +34,26 @@ export function notifyReviewApproved(
 	prizeLabel: string | null,
 	note?: string
 ) {
-	let txt = `🎉 Your project *${projectTitle}* was approved!`;
-	if (rewardPoints > 0) txt += ` +${rewardPoints} points.`;
-	if (prizeLabel) txt += ` Your prize (*${prizeLabel}*) is headed your way.`;
-	if (note) txt += `\n> ${note}`;
-	return fanOut(
-		to,
-		{
-			'Loops - summerCampReviewApprovedProjectTitle': projectTitle,
-			'Loops - summerCampReviewApprovedRewardPoints': rewardPoints,
-			'Loops - summerCampReviewApprovedPrize': prizeLabel ?? '',
-			'Loops - summerCampReviewApprovedNote': note ?? ''
-		},
-		txt
-	);
+	return fanOut(to, {
+		'Loops - summerCampReviewApprovedProjectTitle': projectTitle,
+		'Loops - summerCampReviewApprovedRewardPoints': rewardPoints,
+		'Loops - summerCampReviewApprovedPrize': prizeLabel ?? '',
+		'Loops - summerCampReviewApprovedNote': note ?? ''
+	});
 }
 
 export function notifyReviewChanges(to: Recipient, projectTitle: string, note?: string) {
-	let txt = `✏️ Your project *${projectTitle}* needs a few changes before it's approved.`;
-	if (note) txt += `\n> ${note}`;
-	txt += `\nMake the changes and ship it again from the Submit page.`;
-	return fanOut(
-		to,
-		{
-			'Loops - summerCampReviewChangesProjectTitle': projectTitle,
-			'Loops - summerCampReviewChangesNote': note ?? ''
-		},
-		txt
-	);
+	return fanOut(to, {
+		'Loops - summerCampReviewChangesProjectTitle': projectTitle,
+		'Loops - summerCampReviewChangesNote': note ?? ''
+	});
 }
 
-export function notifyReviewRejected(to: Recipient, projectTitle: string, note?: string) {
-	let txt = `Your project *${projectTitle}* wasn't approved.`;
-	if (note) txt += `\n> ${note}`;
-	return fanOut(
-		to,
-		{
-			'Loops - summerCampReviewRejectedProjectTitle': projectTitle,
-			'Loops - summerCampReviewRejectedNote': note ?? ''
-		},
-		txt
-	);
-}
-
-/** status is one of the notifying order states: packed | shipped | delivered | refunded. */
+/** status is one of the notifying order states: packed | shipped. */
 export function notifyOrderStatus(
 	to: Recipient,
 	itemName: string,
-	status: 'packed' | 'shipped' | 'delivered' | 'refunded',
+	status: 'packed' | 'shipped',
 	trackingUrl?: string | null
 ) {
 	const fieldsByStatus: Record<typeof status, Record<string, unknown>> = {
@@ -98,17 +61,7 @@ export function notifyOrderStatus(
 		shipped: {
 			'Loops - summerCampOrderShippedItemName': itemName,
 			'Loops - summerCampOrderShippedTrackingUrl': trackingUrl ?? ''
-		},
-		delivered: { 'Loops - summerCampOrderDeliveredItemName': itemName },
-		refunded: { 'Loops - summerCampOrderRefundedItemName': itemName }
+		}
 	};
-	const lines: Record<typeof status, string> = {
-		packed: `📦 Your order *${itemName}* is packed and ready to ship.`,
-		shipped: `🚚 Your order *${itemName}* has shipped!`,
-		delivered: `✅ Your order *${itemName}* was delivered. Enjoy!`,
-		refunded: `↩️ Your order *${itemName}* was refunded — your points are back.`
-	};
-	let txt = lines[status];
-	if (status === 'shipped' && trackingUrl) txt += `\nTrack it: ${trackingUrl}`;
-	return fanOut(to, fieldsByStatus[status], txt);
+	return fanOut(to, fieldsByStatus[status]);
 }

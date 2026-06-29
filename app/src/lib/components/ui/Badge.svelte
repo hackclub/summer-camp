@@ -15,7 +15,6 @@
 		ordered: { label: 'Ordered', class: 'bg-sky text-wood-dark' },
 		packed: { label: 'Packed', class: 'bg-sky text-wood-dark' },
 		shipped: { label: 'Shipped', class: 'bg-grass text-white' },
-		delivered: { label: 'Delivered', class: 'bg-grass text-white' },
 		refunded: { label: 'Refunded', class: 'bg-tan text-wood-dark' },
 		canceled: { label: 'Canceled', class: 'bg-tan text-wood-dark' }
 	};

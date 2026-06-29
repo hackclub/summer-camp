@@ -7,11 +7,10 @@ import { requireAdmin } from '$lib/server/auth/guards';
 import { refundOrder } from '$lib/server/points';
 import { notifyOrderStatus, type Recipient } from '$lib/server/notify';
 
-type OrderStatus = 'ordered' | 'packed' | 'shipped' | 'delivered' | 'refunded' | 'canceled';
+type OrderStatus = 'ordered' | 'packed' | 'shipped' | 'refunded' | 'canceled';
 const NEXT: Partial<Record<OrderStatus, OrderStatus>> = {
 	ordered: 'packed',
-	packed: 'shipped',
-	shipped: 'delivered'
+	packed: 'shipped'
 };
 
 export const load: PageServerLoad = async (event) => {
@@ -54,7 +53,7 @@ const label = (row: { itemName: string | null; order: { prizeLabel: string | nul
 	row.itemName ?? row.order.prizeLabel ?? 'your order';
 
 export const actions: Actions = {
-	// Advance ordered → packed → shipped → delivered.
+	// Advance ordered → packed → shipped (shipped is the final state).
 	advance: async (event) => {
 		const admin = requireAdmin(event);
 		const form = await event.request.formData();
@@ -70,17 +69,12 @@ export const actions: Actions = {
 			.set({
 				status: next,
 				updatedAt: new Date(),
-				...(next === 'delivered' ? { fulfilledBy: admin.id, fulfilledAt: new Date() } : {})
+				...(next === 'shipped' ? { fulfilledBy: admin.id, fulfilledAt: new Date() } : {})
 			})
 			.where(eq(shopOrders.id, id));
 
 		const to: Recipient = { email: row.email, slackId: row.slackId, name: row.name };
-		await notifyOrderStatus(
-			to,
-			label(row),
-			next as 'packed' | 'shipped' | 'delivered',
-			row.order.trackingUrl
-		);
+		await notifyOrderStatus(to, label(row), next as 'packed' | 'shipped', row.order.trackingUrl);
 		return { done: true };
 	},
 
@@ -114,8 +108,7 @@ export const actions: Actions = {
 			.update(shopOrders)
 			.set({ status: 'refunded', updatedAt: new Date() })
 			.where(eq(shopOrders.id, id));
-		const to: Recipient = { email: row.email, slackId: row.slackId, name: row.name };
-		await notifyOrderStatus(to, label(row), 'refunded');
+		// No camper notification on refund — refunds are handled / communicated manually.
 		return { done: true };
 	},
 

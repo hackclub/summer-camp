@@ -4,13 +4,13 @@
 
 	let { data } = $props();
 
-	const tabs = ['ordered', 'packed', 'shipped', 'delivered', 'refunded', 'canceled', 'all'];
+	const tabs = ['ordered', 'packed', 'shipped', 'refunded', 'canceled', 'all'];
 	const nextLabel: Record<string, string> = {
 		ordered: 'Mark packed',
-		packed: 'Mark shipped',
-		shipped: 'Mark delivered'
+		packed: 'Mark shipped'
 	};
-	const active = new Set(['ordered', 'packed', 'shipped']); // can still be advanced/refunded
+	// shipped is terminal — no advance, but still refundable/cancelable.
+	const active = new Set(['ordered', 'packed', 'shipped']);
 
 	const formatAddress = (a: Address | null) =>
 		a
@@ -73,12 +73,14 @@
 
 			{#if active.has(row.order.status)}
 				<div class="mt-3 flex flex-wrap items-end gap-2 border-t border-slate-100 pt-3">
-					<form method="POST" action="?/advance" use:enhance>
-						<input type="hidden" name="id" value={row.order.id} />
-						<button type="submit" class="rounded bg-green-700 px-3 py-1.5 text-sm font-bold text-white hover:bg-green-600">
-							{nextLabel[row.order.status]}
-						</button>
-					</form>
+					{#if nextLabel[row.order.status]}
+						<form method="POST" action="?/advance" use:enhance>
+							<input type="hidden" name="id" value={row.order.id} />
+							<button type="submit" class="rounded bg-green-700 px-3 py-1.5 text-sm font-bold text-white hover:bg-green-600">
+								{nextLabel[row.order.status]}
+							</button>
+						</form>
+					{/if}
 					<form method="POST" action="?/setDetails" use:enhance class="flex flex-wrap items-end gap-2">
 						<input type="hidden" name="id" value={row.order.id} />
 						<input

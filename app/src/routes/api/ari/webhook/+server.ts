@@ -5,18 +5,16 @@ import { campDays, projects, shopOrders, users } from '$lib/server/db/schema';
 import { newId } from '$lib/server/ids';
 import { awardShipReward } from '$lib/server/points';
 import { verifyWebhook, type AriWebhook } from '$lib/server/ari';
-import { markApproved, markRejected } from '$lib/server/airtable-ships';
-import {
-	notifyReviewApproved,
-	notifyReviewChanges,
-	notifyReviewRejected,
-	type Recipient
-} from '$lib/server/notify';
+import { markApproved } from '$lib/server/airtable-ships';
+import { notifyReviewApproved, notifyReviewChanges, type Recipient } from '$lib/server/notify';
 
 // New project status per decision event (fraud is informational, no change).
-const NEW_STATUS: Record<string, 'approved' | 'rejected' | 'building' | 'submitted'> = {
+// Camp only has two review outcomes: approved, or changes requested. Ari's
+// `review.rejected` is treated as "changes requested" — the project goes back to
+// building and the camper is asked to revise, never a dead-end rejection.
+const NEW_STATUS: Record<string, 'approved' | 'building' | 'submitted'> = {
 	'review.approved': 'approved',
-	'review.rejected': 'rejected',
+	'review.rejected': 'building',
 	'review.changes': 'building',
 	'review.reverted': 'submitted',
 	'review.requeued': 'submitted'
@@ -116,12 +114,9 @@ export const POST: RequestHandler = async (event) => {
 			if (to) await notifyReviewApproved(to, project.title, rewardPoints, prizeLabel, note);
 			break;
 		}
-		case 'review.rejected': {
-			if (recordId) await markRejected(recordId);
-			if (to) await notifyReviewRejected(to, project.title, note);
-			break;
-		}
+		case 'review.rejected':
 		case 'review.changes': {
+			// Both route to the same "make a few changes and ship again" path.
 			if (to) await notifyReviewChanges(to, project.title, note);
 			break;
 		}

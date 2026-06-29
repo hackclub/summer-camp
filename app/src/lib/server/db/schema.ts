@@ -241,7 +241,7 @@ export const shopOrders = pgTable('shop_orders', {
 	sourceProjectId: text('source_project_id').references(() => projects.id),
 	pricePoints: integer('price_points').notNull(), // snapshot at purchase; 0 for prizes
 	status: text('status', {
-		enum: ['ordered', 'packed', 'shipped', 'delivered', 'refunded', 'canceled']
+		enum: ['ordered', 'packed', 'shipped', 'refunded', 'canceled']
 	})
 		.notNull()
 		.default('ordered'),

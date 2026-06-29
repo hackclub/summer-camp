@@ -4,7 +4,7 @@ import { db } from '$lib/server/db';
 import { shopItems, shopOrders, users } from '$lib/server/db/schema';
 import { requireAdmin } from '$lib/server/auth/guards';
 
-type OrderStatus = 'ordered' | 'packed' | 'shipped' | 'delivered' | 'refunded' | 'canceled';
+type OrderStatus = 'ordered' | 'packed' | 'shipped' | 'refunded' | 'canceled';
 
 function cell(v: unknown): string {
 	const s = v == null ? '' : String(v);
