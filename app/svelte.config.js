@@ -23,6 +23,8 @@ const config = {
 				'font-src': ['self'],
 				'connect-src': ['self'],
 				'object-src': ['none'],
+				// Allow embedding YouTube (day-page video embeds); nothing else.
+				'frame-src': ['self', 'https://www.youtube-nocookie.com', 'https://www.youtube.com'],
 				'base-uri': ['self'],
 				'frame-ancestors': ['none'],
 				'form-action': ['self']

@@ -2,7 +2,11 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { etDateString, etDayLabel, etWallTime, JOIN_OPENS, SESSION_END } from '$lib/camp-time';
+	import { youtubeEmbedUrl } from '$lib/youtube';
 	import { FileText, Link as LinkIcon, Play, Presentation } from 'lucide-svelte';
+
+	const YT_ALLOW =
+		'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
 
 	let { data } = $props();
 
@@ -40,34 +44,63 @@
 
 	{#if data.materials.length > 0}
 		<Card title="Materials">
-			<div class="flex flex-col gap-2">
+			<div class="flex flex-col gap-3">
 				{#each data.materials as material (material.id)}
 					{@const Icon = icons[material.kind]}
-					<a
-						href={material.url}
-						target="_blank"
-						rel="noopener"
-						class="flex items-center gap-2 rounded-xl border-2 border-tan p-3 font-bold text-wood-dark transition hover:border-dashed hover:border-wood"
-					>
-						<Icon class="size-5 text-wood" />
-						{material.title}
-					</a>
+					{@const embed = youtubeEmbedUrl(material.url)}
+					{#if embed}
+						<div class="flex flex-col gap-2">
+							<p class="flex items-center gap-2 font-bold text-wood-dark">
+								<Icon class="size-5 text-wood" />{material.title}
+							</p>
+							<iframe
+								src={embed}
+								title={material.title}
+								class="aspect-video w-full rounded-xl border-2 border-tan"
+								allow={YT_ALLOW}
+								allowfullscreen
+								loading="lazy"
+							></iframe>
+						</div>
+					{:else}
+						<a
+							href={material.url}
+							target="_blank"
+							rel="noopener"
+							class="flex items-center gap-2 rounded-xl border-2 border-tan p-3 font-bold text-wood-dark transition hover:border-dashed hover:border-wood"
+						>
+							<Icon class="size-5 text-wood" />
+							{material.title}
+						</a>
+					{/if}
 				{/each}
 			</div>
 		</Card>
 	{/if}
 
 	{#if data.day.recordingUrl}
+		{@const recEmbed = youtubeEmbedUrl(data.day.recordingUrl)}
 		<Card title="Recording">
-			<a
-				href={data.day.recordingUrl}
-				target="_blank"
-				rel="noopener"
-				class="flex items-center gap-2 rounded-xl border-2 border-tan p-3 font-bold text-wood-dark transition hover:border-dashed hover:border-wood"
-			>
-				<Play class="size-5 text-wood" />
-				Watch the session recording
-			</a>
+			{#if recEmbed}
+				<iframe
+					src={recEmbed}
+					title="Session recording"
+					class="aspect-video w-full rounded-xl border-2 border-tan"
+					allow={YT_ALLOW}
+					allowfullscreen
+					loading="lazy"
+				></iframe>
+			{:else}
+				<a
+					href={data.day.recordingUrl}
+					target="_blank"
+					rel="noopener"
+					class="flex items-center gap-2 rounded-xl border-2 border-tan p-3 font-bold text-wood-dark transition hover:border-dashed hover:border-wood"
+				>
+					<Play class="size-5 text-wood" />
+					Watch the session recording
+				</a>
+			{/if}
 		</Card>
 	{/if}
 </div>
