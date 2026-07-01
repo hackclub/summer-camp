@@ -1,10 +1,10 @@
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
-import { announcements, campDays, projects } from '$lib/server/db/schema';
+import { announcements, campDays, campDayMaterials, projects } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/auth/guards';
 import { openLessons } from '$lib/server/lessons';
-import type { CampDayLite } from '$lib/camp-time';
+import { etDayLabel, type CampDayLite } from '$lib/camp-time';
 
 function loadDays(): Promise<CampDayLite[]> {
 	return db
@@ -40,24 +40,76 @@ export const load: PageServerLoad = async (event) => {
 			.limit(4)
 	]);
 
-	// Open lessons (today, once launched, + yesterday) and how many the camper
-	// still needs to ship — drives the "Submit a project" prompt.
+	// Open lessons (today once launched + yesterday, plus launch-week grace days).
+	// Build a rich card per open day: its materials, reward, and ship status.
 	const open = openLessons(new Date(), days);
-	let toSubmit = 0;
-	for (const day of open) {
-		const [p] = await db
-			.select({ status: projects.status })
-			.from(projects)
-			.where(and(eq(projects.userId, user.id), eq(projects.campDayId, day.id)))
-			.limit(1);
-		if (!p || !shippedStatuses.includes(p.status as (typeof shippedStatuses)[number])) toSubmit++;
+	const openIds = open.map((d) => d.id);
+
+	const [materials, rewardMeta, myOpenProjects] = await Promise.all([
+		openIds.length
+			? db
+					.select({
+						campDayId: campDayMaterials.campDayId,
+						title: campDayMaterials.title,
+						url: campDayMaterials.url,
+						kind: campDayMaterials.kind
+					})
+					.from(campDayMaterials)
+					.where(inArray(campDayMaterials.campDayId, openIds))
+					.orderBy(campDayMaterials.sort)
+			: [],
+		openIds.length
+			? db
+					.select({
+						id: campDays.id,
+						rewardPoints: campDays.rewardPoints,
+						prizeLabel: campDays.prizeLabel
+					})
+					.from(campDays)
+					.where(inArray(campDays.id, openIds))
+			: [],
+		openIds.length
+			? db
+					.select({ campDayId: projects.campDayId, status: projects.status })
+					.from(projects)
+					.where(and(eq(projects.userId, user.id), inArray(projects.campDayId, openIds)))
+			: []
+	]);
+
+	const materialsByDay = new Map<string, { title: string; url: string; kind: string }[]>();
+	for (const m of materials) {
+		const list = materialsByDay.get(m.campDayId) ?? [];
+		list.push({ title: m.title, url: m.url, kind: m.kind });
+		materialsByDay.set(m.campDayId, list);
 	}
+	const rewardById = new Map(rewardMeta.map((r) => [r.id, r]));
+	const statusByDay = new Map(myOpenProjects.map((p) => [p.campDayId, p.status]));
+	const isShipped = (s: string | undefined) =>
+		!!s && shippedStatuses.includes(s as (typeof shippedStatuses)[number]);
+
+	const openDays = open.map((d) => {
+		const status = statusByDay.get(d.id);
+		return {
+			id: d.id,
+			title: d.title,
+			label: etDayLabel(d.date),
+			joinUrl: d.joinUrl ?? null,
+			recordingUrl: d.recordingUrl ?? null,
+			materials: materialsByDay.get(d.id) ?? [],
+			rewardPoints: rewardById.get(d.id)?.rewardPoints ?? 0,
+			prizeLabel: rewardById.get(d.id)?.prizeLabel ?? null,
+			shipped: isShipped(status),
+			status: status ?? null
+		};
+	});
+	const toSubmit = openDays.filter((d) => !d.shipped).length;
 
 	return {
 		days,
 		announcements: latestAnnouncements,
 		myProjects,
 		openCount: open.length,
-		toSubmit
+		toSubmit,
+		openDays
 	};
 };

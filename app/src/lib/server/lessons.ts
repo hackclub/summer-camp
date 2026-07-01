@@ -1,18 +1,14 @@
-import { getCampState, etDateString, etWallTime, type CampDayLite } from '$lib/camp-time';
+import {
+	getCampState,
+	etDateString,
+	isLaunchGraceOpen,
+	LAUNCH_WEEK_DATES,
+	type CampDayLite
+} from '$lib/camp-time';
 
-// Launch-week grace: the first five lessons (Mon Jun 29 – Fri Jul 3) stay open
-// to submit/ship anytime until the end of Sun Jul 5 ET, so campers can catch up
-// over the first weekend. Self-expires — after the cutoff the normal
-// today+yesterday window applies to every day.
-const GRACE_DATES = new Set([
-	'2026-06-29',
-	'2026-06-30',
-	'2026-07-01',
-	'2026-07-02',
-	'2026-07-03'
-]);
-// Exclusive cutoff = midnight Jul 6 ET, i.e. open through 11:59 PM Sun Jul 5.
-const graceOpen = (now: Date) => now < etWallTime('2026-07-06', 0, 0);
+// Launch-week grace (dates + cutoff live in camp-time so the UI shares them):
+// the first five lessons stay open to submit/ship until the end of Sun Jul 5 ET.
+const GRACE_DATES = new Set<string>(LAUNCH_WEEK_DATES);
 
 /** Shift a YYYY-MM-DD date string by whole days (pure calendar arithmetic). */
 function shiftDate(dateStr: string, deltaDays: number): string {
@@ -34,7 +30,7 @@ export function openLessons(now: Date, days: CampDayLite[]): CampDayLite[] {
 	const yesterday = shiftDate(today, -1);
 	const state = getCampState(now, days);
 	const todayLaunched = state.kind === 'live' || state.kind === 'post-session';
-	const inGrace = graceOpen(now);
+	const inGrace = isLaunchGraceOpen(now);
 
 	return days
 		.filter(

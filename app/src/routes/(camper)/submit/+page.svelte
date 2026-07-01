@@ -7,11 +7,22 @@
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import ProjectForm from '$lib/components/projects/ProjectForm.svelte';
 	import AddressFields from '$lib/components/projects/AddressFields.svelte';
+	import { isLaunchGraceOpen } from '$lib/camp-time';
 
 	let { data, form } = $props();
 
 	const justShipped = $derived(page.url.searchParams.get('shipped') === '1');
 	const errorsFor = (id: string) => (form?.campDayId === id ? (form?.errors ?? {}) : {});
+	const graceOpen = isLaunchGraceOpen(new Date());
+
+	// Which lesson's form is showing. Prefer ?day= (deep link from the home
+	// cards), then a form-error target, then the first open lesson.
+	let selectedId = $state(
+		page.url.searchParams.get('day') ?? form?.campDayId ?? data.lessons[0]?.day.id
+	);
+	const selected = $derived(
+		data.lessons.find((l) => l.day.id === selectedId) ?? data.lessons[0] ?? null
+	);
 </script>
 
 <svelte:head><title>Submit a project — Hack Club Summer Camp</title></svelte:head>
@@ -19,6 +30,12 @@
 <PageHeader title="Submit a project" subtitle="One project per lesson — ship it before it locks" />
 
 <div class="mx-auto flex max-w-xl flex-col gap-6">
+	{#if graceOpen}
+		<p class="rounded-xl border-4 border-wood bg-cream p-3 text-center font-bold text-wood-dark">
+			You can submit days 1–5 until Sunday at 11:59 PM ET!
+		</p>
+	{/if}
+
 	{#if justShipped}
 		<p class="rounded-xl bg-grass/20 p-3 text-center font-bold text-grass-dark">
 			Shipped! Counselors will review it and your points land once it's approved. 🎉
@@ -31,7 +48,24 @@
 			body="You can submit a project for a lesson during its session and the day after. Come back once today's session has started!"
 		/>
 	{:else}
-		{#each data.lessons as lesson (lesson.day.id)}
+		{#if data.lessons.length > 1}
+			<label class="flex flex-col gap-1">
+				<span class="font-bold text-wood-dark">Which lesson?</span>
+				<select
+					bind:value={selectedId}
+					class="rounded-xl border-4 border-wood bg-cream px-3 py-2 font-bold text-wood-dark"
+				>
+					{#each data.lessons as lesson (lesson.day.id)}
+						<option value={lesson.day.id}>
+							{lesson.day.label} — {lesson.day.title}{lesson.shipped ? ' (shipped)' : ''}
+						</option>
+					{/each}
+				</select>
+			</label>
+		{/if}
+
+		{#if selected}
+			{@const lesson = selected}
 			<Card title={lesson.day.title}>
 				<p class="text-sm font-bold text-wood">{lesson.day.label}</p>
 				{#if lesson.day.rewardPoints > 0 || lesson.day.prizeLabel}
@@ -97,6 +131,6 @@
 					</form>
 				{/if}
 			</Card>
-		{/each}
+		{/if}
 	{/if}
 </div>
