@@ -33,7 +33,10 @@
 		<div
 			class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-2xl border-4 border-wood bg-cream px-5 py-3 text-center"
 		>
-			<span class="font-bold text-wood-dark">You can submit days 1–5 until Sunday at 11:59 PM ET!</span>
+			<span class="font-bold text-wood-dark"
+				>You can submit days 1–4 until Wednesday at 11:59 PM ET! Open the day below (or its page) and
+				hit Submit to ship.</span
+			>
 			<span class="font-melon-camp text-xl text-wood">
 				<Countdown target={closeAt} {now} /> left
 			</span>

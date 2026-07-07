@@ -7,8 +7,12 @@ import {
 } from '$lib/camp-time';
 
 // Launch-week grace (dates + cutoff live in camp-time so the UI shares them):
-// the first five lessons stay open to submit/ship until the end of Sun Jul 5 ET.
+// the first lessons stay open to submit/ship until the end of Wed Jul 8 ET.
 const GRACE_DATES = new Set<string>(LAUNCH_WEEK_DATES);
+
+// Dates that are never submittable, even if the today/yesterday/grace rules
+// would otherwise open them (e.g. Mon Jul 6 — campers finish days 1–4 first).
+const BLOCKED_DATES = new Set<string>(['2026-07-06']);
 
 /** Shift a YYYY-MM-DD date string by whole days (pure calendar arithmetic). */
 function shiftDate(dateStr: string, deltaDays: number): string {
@@ -35,9 +39,10 @@ export function openLessons(now: Date, days: CampDayLite[]): CampDayLite[] {
 	return days
 		.filter(
 			(d) =>
-				(d.date === today && todayLaunched) ||
-				d.date === yesterday ||
-				(inGrace && GRACE_DATES.has(d.date))
+				!BLOCKED_DATES.has(d.date) &&
+				((d.date === today && todayLaunched) ||
+					d.date === yesterday ||
+					(inGrace && GRACE_DATES.has(d.date)))
 		)
 		.sort((a, b) => b.date.localeCompare(a.date));
 }

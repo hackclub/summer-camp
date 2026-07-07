@@ -32,7 +32,7 @@
 <div class="mx-auto flex max-w-xl flex-col gap-6">
 	{#if graceOpen}
 		<p class="rounded-xl border-4 border-wood bg-cream p-3 text-center font-bold text-wood-dark">
-			You can submit days 1–5 until Sunday at 11:59 PM ET!
+			You can submit days 1–4 until Wednesday at 11:59 PM ET! Pick the day below to ship it.
 		</p>
 	{/if}
 

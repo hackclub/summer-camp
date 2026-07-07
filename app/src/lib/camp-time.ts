@@ -9,7 +9,7 @@ export const SESSION_END = { hour: 15, minute: 0 };
 export const JOIN_OPENS = { hour: 11, minute: 50 };
 
 // Launch-week submission grace: the first five lessons (Mon Jun 29 – Fri Jul 3)
-// stay open to submit until this instant (end of Sun Jul 5 ET). Shared by the
+// stay open to submit until this instant (end of Wed Jul 8 ET). Shared by the
 // server-side open-window logic and the UI banner/countdown.
 export const LAUNCH_WEEK_DATES = [
 	'2026-06-29',
@@ -19,7 +19,7 @@ export const LAUNCH_WEEK_DATES = [
 	'2026-07-03'
 ] as const;
 export function submissionCloseAt(): Date {
-	return etWallTime('2026-07-06', 0, 0); // midnight Jul 6 ET = through 11:59 PM Sun Jul 5
+	return etWallTime('2026-07-09', 0, 0); // midnight Jul 9 ET = through 11:59 PM Wed Jul 8
 }
 export function isLaunchGraceOpen(now: Date): boolean {
 	return now < submissionCloseAt();
