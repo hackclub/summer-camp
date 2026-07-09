@@ -14,6 +14,8 @@ const TABLE_ID = env.YSWS_SUBMISSION_TABLE ?? 'tblFTKKHAJy6U8lle';
 
 const APPROVE_FIELD = 'Automation - Submit to Unified YSWS';
 const REJECT_FIELD = 'Rejected';
+const OVERRIDE_HOURS_FIELD = 'Optional - Override Hours Spent';
+const OVERRIDE_HOURS_JUSTIFICATION_FIELD = 'Optional - Override Hours Spent Justification';
 
 function table() {
 	if (!env.AIRTABLE_API_KEY) return null;
@@ -62,10 +64,21 @@ export async function createSubmissionRecord(project: Project, user: User): Prom
 	return created[0].id;
 }
 
-/** Tick the Unified-YSWS automation checkbox after Ari approves. */
-export async function markApproved(recordId: string): Promise<void> {
+/** Tick the Unified-YSWS automation checkbox after Ari approves. Ari's approved
+ *  hours + audit note are written into the override fields FIRST (in a separate
+ *  update) so the base's automation, which fires on the checkbox, sees them. */
+export async function markApproved(
+	recordId: string,
+	override?: { hours?: number | null; justification?: string | null }
+): Promise<void> {
 	const t = table();
 	if (!t) throw new Error('AIRTABLE_API_KEY / YSWS_BASE_ID not configured');
+
+	const pre: Airtable.FieldSet = {};
+	if (override?.hours != null) pre[OVERRIDE_HOURS_FIELD] = override.hours;
+	if (override?.justification) pre[OVERRIDE_HOURS_JUSTIFICATION_FIELD] = override.justification;
+	if (Object.keys(pre).length) await t.update(recordId, pre);
+
 	await t.update(recordId, { [APPROVE_FIELD]: true });
 }
 

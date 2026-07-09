@@ -163,5 +163,10 @@ export interface AriWebhook {
 	decision: 'approved' | 'changes' | 'rejected' | null;
 	id: string;
 	external_id: string;
-	review?: { note_to_maker?: string };
+	review?: {
+		note_to_maker?: string;
+		audit_note?: string;
+		approved_hours?: number;
+		approved_minutes?: number;
+	};
 }

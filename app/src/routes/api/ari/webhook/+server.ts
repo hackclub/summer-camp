@@ -123,7 +123,18 @@ export const POST: RequestHandler = async (event) => {
 					})
 					.onConflictDoNothing();
 			}
-			if (recordId) await markApproved(recordId); // throws -> 500 -> Ari retries
+			// Record Ari's approved hours + audit note on the YSWS submission (into
+			// the override fields) before ticking the Unified-YSWS box.
+			const approvedHours =
+				payload.review?.approved_hours ??
+				(payload.review?.approved_minutes != null
+					? Math.round((payload.review.approved_minutes / 60) * 100) / 100
+					: null);
+			if (recordId)
+				await markApproved(recordId, {
+					hours: approvedHours,
+					justification: payload.review?.audit_note ?? null
+				}); // throws -> 500 -> Ari retries
 			if (to) await notifyReviewApproved(to, project.title, rewardPoints, prizeLabel, note);
 			break;
 		}
