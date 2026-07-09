@@ -21,6 +21,7 @@ export const users = pgTable('users', {
 	name: text('name'),
 	slackId: text('slack_id'),
 	hackClubId: text('hack_club_id'), // OIDC `sub`, set after IDV
+	birthday: text('birthday'), // YYYY-MM-DD from the IDV `birthdate` claim; for YSWS
 	identityVerified: boolean('identity_verified').notNull().default(false),
 	// Latest raw result from Hack Club Identity's YSWS check API (verified_eligible
 	// / verified_but_over_18 / rejected / pending / needs_submission / not_found).

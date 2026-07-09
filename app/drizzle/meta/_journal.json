@@ -64,6 +64,13 @@
       "when": 1781902271651,
       "tag": "0008_security_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1781903271651,
+      "tag": "0009_user_birthday",
+      "breakpoints": true
     }
   ]
 }

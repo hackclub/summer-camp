@@ -18,7 +18,7 @@ import {
 const AUTHORIZE_URL = 'https://auth.hackclub.com/oauth/authorize';
 const TOKEN_URL = 'https://auth.hackclub.com/oauth/token';
 const USERINFO_URL = 'https://auth.hackclub.com/oauth/userinfo';
-const SCOPES = 'openid profile email slack_id verification_status';
+const SCOPES = 'openid profile email slack_id verification_status birthdate';
 const STATE_COOKIE = 'idv_state';
 
 function redirectUri(): string {
@@ -91,6 +91,7 @@ export async function handleCallback(
 		name?: string;
 		slack_id?: string;
 		verification_status?: string;
+		birthdate?: string; // OIDC claim, YYYY-MM-DD (from the `birthdate` scope)
 	};
 
 	// Eligibility comes from Identity's external check API (keyed by the IDV id),
@@ -128,7 +129,8 @@ export async function handleCallback(
 			yswsCheckResult: checkResult,
 			hackClubId: info.sub,
 			slackId: info.slack_id ?? current[0]?.slackId ?? null,
-			name: current[0]?.name ?? info.name ?? null
+			name: current[0]?.name ?? info.name ?? null,
+			birthday: info.birthdate ?? current[0]?.birthday ?? null
 		})
 		.where(eq(users.id, userId));
 
