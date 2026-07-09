@@ -1,20 +1,17 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/theme/PageHeader.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { Coins } from 'lucide-svelte';
-
-	let { data } = $props();
 </script>
 
 <svelte:head><title>Prize shop — Hack Club Summer Camp</title></svelte:head>
 
 <PageHeader title="Prize shop" subtitle="Camp is moving to Stardance" />
 
-<div class="mb-6 flex justify-center">
-	<div class="flex items-center gap-2 rounded-full border-4 border-wood bg-cream px-5 py-2">
-		<Coins class="size-6 text-wood" />
-		<span class="text-xl font-bold text-wood-dark tabular-nums">{data.balance} Stardust</span>
-	</div>
+<div
+	class="mx-auto mb-6 max-w-xl rounded-2xl border-4 border-grass bg-grass/15 p-5 text-center text-wood-dark"
+>
+	<p class="font-melon-camp text-xl text-grass-dark">🎽 Ship all 7 days to earn an exclusive t-shirt!</p>
+	<p class="mt-1 text-sm">Get every one of the 7 lessons shipped by <strong>Saturday, July 11</strong> and we'll send you a limited-edition camp tee.</p>
 </div>
 
 <div class="mx-auto max-w-xl rounded-2xl border-4 border-wood bg-cream p-6 text-center">
