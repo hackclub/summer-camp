@@ -1,18 +1,4 @@
-import {
-	getCampState,
-	etDateString,
-	isLaunchGraceOpen,
-	LAUNCH_WEEK_DATES,
-	type CampDayLite
-} from '$lib/camp-time';
-
-// Launch-week grace (dates + cutoff live in camp-time so the UI shares them):
-// the first lessons stay open to submit/ship until the end of Wed Jul 8 ET.
-const GRACE_DATES = new Set<string>(LAUNCH_WEEK_DATES);
-
-// Dates that are never submittable, even if the today/yesterday/grace rules
-// would otherwise open them (e.g. Mon Jul 6 — campers finish days 1–4 first).
-const BLOCKED_DATES = new Set<string>(['2026-07-06']);
+import { getCampState, etDateString, isLaunchGraceOpen, type CampDayLite } from '$lib/camp-time';
 
 /** Shift a YYYY-MM-DD date string by whole days (pure calendar arithmetic). */
 function shiftDate(dateStr: string, deltaDays: number): string {
@@ -23,27 +9,23 @@ function shiftDate(dateStr: string, deltaDays: number): string {
 }
 
 /**
- * The lessons a camper may submit/ship a project for right now (newest first):
- *   - today's lesson, once its session has started (live or wrapped),
- *   - the immediately previous calendar day's lesson (a strict one-day grace), and
- *   - during launch week, any of days 1–5 until the end of Sun Jul 5 ET.
- * Anything else is locked.
+ * The lessons a camper may submit/ship a project for right now (newest first).
+ *   - Wind-down grace (until end of Fri Jul 11 ET): EVERY published lesson is open,
+ *     so campers can finish anything before we move to Stardance.
+ *   - After that: today's lesson (once its session has started) + yesterday's.
  */
 export function openLessons(now: Date, days: CampDayLite[]): CampDayLite[] {
+	if (isLaunchGraceOpen(now)) {
+		return [...days].sort((a, b) => b.date.localeCompare(a.date));
+	}
+
 	const today = etDateString(now);
 	const yesterday = shiftDate(today, -1);
 	const state = getCampState(now, days);
 	const todayLaunched = state.kind === 'live' || state.kind === 'post-session';
-	const inGrace = isLaunchGraceOpen(now);
 
 	return days
-		.filter(
-			(d) =>
-				!BLOCKED_DATES.has(d.date) &&
-				((d.date === today && todayLaunched) ||
-					d.date === yesterday ||
-					(inGrace && GRACE_DATES.has(d.date)))
-		)
+		.filter((d) => (d.date === today && todayLaunched) || d.date === yesterday)
 		.sort((a, b) => b.date.localeCompare(a.date));
 }
 

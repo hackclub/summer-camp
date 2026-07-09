@@ -32,13 +32,13 @@
 <div class="mx-auto flex max-w-xl flex-col gap-6">
 	{#if graceOpen}
 		<p class="rounded-xl border-4 border-wood bg-cream p-3 text-center font-bold text-wood-dark">
-			You can submit days 1–4 until Wednesday at 11:59 PM ET! Pick the day below to ship it.
+			Last call — you can ship any lesson until Friday, July 11 at 11:59 PM ET! Pick the day below.
 		</p>
 	{/if}
 
 	{#if justShipped}
 		<p class="rounded-xl bg-grass/20 p-3 text-center font-bold text-grass-dark">
-			Shipped! Counselors will review it and your points land once it's approved. 🎉
+			Shipped! Counselors will review it and your Stardust lands once it's approved. 🎉
 		</p>
 	{/if}
 
@@ -71,7 +71,7 @@
 				{#if lesson.day.rewardPoints > 0 || lesson.day.prizeLabel}
 					<p class="mb-4 text-sm text-grass-dark">
 						Approved gets you
-						{#if lesson.day.rewardPoints > 0}<strong>+{lesson.day.rewardPoints} pts</strong>{/if}{#if lesson.day.rewardPoints > 0 && lesson.day.prizeLabel}
+						{#if lesson.day.rewardPoints > 0}<strong>+{lesson.day.rewardPoints} Stardust</strong>{/if}{#if lesson.day.rewardPoints > 0 && lesson.day.prizeLabel}
 							and{/if}{#if lesson.day.prizeLabel}
 							the prize <strong>{lesson.day.prizeLabel}</strong>{/if}.
 					</p>

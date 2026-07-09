@@ -27,15 +27,15 @@
 <svelte:head><title>Today — Hack Club Summer Camp</title></svelte:head>
 
 <div class="flex flex-col gap-6">
-	<SessionHero days={data.days} />
+	<SessionHero days={data.days} email={data.user?.email} />
 
 	{#if graceOpen}
 		<div
 			class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-2xl border-4 border-wood bg-cream px-5 py-3 text-center"
 		>
 			<span class="font-bold text-wood-dark"
-				>You can submit days 1–4 until Wednesday at 11:59 PM ET! Open the day below (or its page) and
-				hit Submit to ship.</span
+				>Last call — you can ship any lesson until Friday, July 11 at 11:59 PM ET! Open the day below
+				(or its page) and hit Submit.</span
 			>
 			<span class="font-melon-camp text-xl text-wood">
 				<Countdown target={closeAt} {now} /> left
@@ -65,12 +65,12 @@
 	<!-- My points + the open lessons, side by side. Only open days show; the grid
 	     scales to however many there are. Each lesson expands to its resources. -->
 	<div class="grid gap-4 sm:grid-cols-3">
-		<Card title="My points">
+		<Card title="My Stardust">
 			<div class="flex items-center gap-2">
 				<Coins class="size-8 text-wood" />
 				<span class="text-3xl font-bold text-wood-dark tabular-nums">{data.balance}</span>
 			</div>
-			<p class="mt-2 text-sm text-wood-dark">Earn points by showing up and shipping.</p>
+			<p class="mt-2 text-sm text-wood-dark">Earn Stardust by showing up and shipping.</p>
 			<div class="mt-4">
 				<Button href="{base}/shop" variant="secondary" size="sm">Visit the shop</Button>
 			</div>
@@ -96,7 +96,7 @@
 					{#if d.rewardPoints > 0 || d.prizeLabel}
 						<p class="text-sm text-grass-dark">
 							Approved gets you
-							{#if d.rewardPoints > 0}<strong>+{d.rewardPoints} pts</strong>{/if}{#if d.rewardPoints > 0 && d.prizeLabel}
+							{#if d.rewardPoints > 0}<strong>+{d.rewardPoints} Stardust</strong>{/if}{#if d.rewardPoints > 0 && d.prizeLabel}
 								and{/if}{#if d.prizeLabel} the prize <strong>{d.prizeLabel}</strong>{/if}.
 						</p>
 					{/if}

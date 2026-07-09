@@ -8,18 +8,11 @@ export const SESSION_END = { hour: 15, minute: 0 };
 // Join opens a little early so nobody is locked out at 12:00:01.
 export const JOIN_OPENS = { hour: 11, minute: 50 };
 
-// Launch-week submission grace: the first five lessons (Mon Jun 29 – Fri Jul 3)
-// stay open to submit until this instant (end of Wed Jul 8 ET). Shared by the
-// server-side open-window logic and the UI banner/countdown.
-export const LAUNCH_WEEK_DATES = [
-	'2026-06-29',
-	'2026-06-30',
-	'2026-07-01',
-	'2026-07-02',
-	'2026-07-03'
-] as const;
+// Final wind-down grace (camp is moving to Stardance): EVERY lesson stays open
+// to submit until this instant (end of Fri Jul 11 ET). Shared by the server-side
+// open-window logic and the UI banner/countdown.
 export function submissionCloseAt(): Date {
-	return etWallTime('2026-07-09', 0, 0); // midnight Jul 9 ET = through 11:59 PM Wed Jul 8
+	return etWallTime('2026-07-12', 0, 0); // midnight Jul 12 ET = through 11:59 PM Fri Jul 11
 }
 export function isLaunchGraceOpen(now: Date): boolean {
 	return now < submissionCloseAt();

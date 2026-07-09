@@ -21,7 +21,7 @@
 {#if data.orders.length === 0}
 	<EmptyState
 		title="Nothing ordered yet"
-		body="Check out the prize shop — your points are waiting to be spent!"
+		body="Check out the prize shop — your Stardust is waiting to be spent!"
 		actionLabel="Visit the shop"
 		actionHref={`${base}/shop`}
 	/>

@@ -5,7 +5,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 
-	let { days }: { days: CampDayLite[] } = $props();
+	let { days, email = null }: { days: CampDayLite[]; email?: string | null } = $props();
 
 	// Re-evaluate on a ticking clock so the JOIN button flips to live on its own.
 	let now = $state(new Date());
@@ -15,6 +15,9 @@
 	});
 
 	const campState = $derived(getCampState(now, days));
+	const stardanceSignup = $derived(
+		`https://forms.hackclub.com/t/jS6kyAAsJfus?email=${encodeURIComponent(email ?? '')}`
+	);
 </script>
 
 <section
@@ -82,14 +85,15 @@
 			<Button href="{base}/gallery" variant="secondary">Browse the gallery</Button>
 		</div>
 	{:else}
-		<h1 class="font-melon-camp text-3xl text-wood sm:text-4xl">That's a wrap on Summer Camp!</h1>
+		<h1 class="font-melon-camp text-3xl text-wood sm:text-4xl">We're moving to Stardance!</h1>
 		<p class="text-wood-dark">
-			Thanks for an amazing summer. Your projects live on in the gallery — and don't forget to spend
-			your points!
+			Thanks for staying with us! We'll be moving to Stardance starting next week.
+			<a href={stardanceSignup} target="_blank" rel="noopener" class="text-wood underline">
+				Sign up here</a>.
 		</p>
 		<div class="flex flex-wrap justify-center gap-3">
 			<Button href="{base}/gallery" variant="secondary">The gallery</Button>
-			<Button href="{base}/shop">Spend your points</Button>
+			<Button href={stardanceSignup} target="_blank" rel="noopener">Sign up for Stardance</Button>
 		</div>
 	{/if}
 </section>

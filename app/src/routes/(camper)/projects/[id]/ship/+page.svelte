@@ -62,7 +62,7 @@
 		{:else}
 			<Card>
 				<p class="mb-4 text-wood-dark">
-					Once you ship, counselors will review it — points land when it's approved. Shipped
+					Once you ship, counselors will review it — Stardust lands when it's approved. Shipped
 					projects are locked, so make sure it's ready!
 				</p>
 				{#if form?.shipFailed}

@@ -39,7 +39,7 @@
 					<Badge status={project.status} />
 				</div>
 				{#if project.status === 'submitted'}
-					<p class="mt-1 text-xs text-wood-dark">+50 pts pending review</p>
+					<p class="mt-1 text-xs text-wood-dark">+50 Stardust pending review</p>
 				{/if}
 			</a>
 		{/each}
