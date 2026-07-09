@@ -44,8 +44,6 @@ export async function createSubmissionRecord(project: Project, user: User): Prom
 		Description: project.description ?? '',
 		'GitHub Username': githubUsername(project.githubUrl)
 	};
-	// Birthday captured from IDV (the `birthdate` scope), for Unified YSWS.
-	if (user.birthday) fields['Birthday'] = user.birthday;
 	if (project.screenshotUrl) {
 		// Airtable accepts {url} for new attachments; its TS type wants the full
 		// server-populated Attachment shape, hence the cast (same as airtable.ts).
