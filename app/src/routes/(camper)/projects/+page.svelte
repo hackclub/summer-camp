@@ -38,8 +38,8 @@
 					<h3 class="font-bold text-wood-dark">{project.title}</h3>
 					<Badge status={project.status} />
 				</div>
-				{#if project.status === 'submitted'}
-					<p class="mt-1 text-xs text-wood-dark">+50 Stardust pending review</p>
+				{#if project.status === 'submitted' && project.rewardPoints && project.rewardPoints > 0}
+					<p class="mt-1 text-xs text-wood-dark">+{project.rewardPoints} Stardust pending review</p>
 				{/if}
 			</a>
 		{/each}
