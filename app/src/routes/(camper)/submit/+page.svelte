@@ -32,7 +32,7 @@
 <div class="mx-auto flex max-w-xl flex-col gap-6">
 	{#if graceOpen}
 		<p class="rounded-xl border-4 border-wood bg-cream p-3 text-center font-bold text-wood-dark">
-			Last call — you can ship any lesson until Friday, July 11 at 11:59 PM ET! Pick the day below.
+			Last call — you can ship any lesson until Saturday, July 11 at 11:59 PM ET! Pick the day below.
 		</p>
 	{/if}
 

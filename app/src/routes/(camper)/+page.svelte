@@ -34,7 +34,7 @@
 			class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-2xl border-4 border-wood bg-cream px-5 py-3 text-center"
 		>
 			<span class="font-bold text-wood-dark"
-				>Last call — you can ship any lesson until Friday, July 11 at 11:59 PM ET! Open the day below
+				>Last call — you can ship any lesson until Saturday, July 11 at 11:59 PM ET! Open the day below
 				(or its page) and hit Submit.</span
 			>
 			<span class="font-melon-camp text-xl text-wood">
