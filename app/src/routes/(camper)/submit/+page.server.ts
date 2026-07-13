@@ -9,7 +9,7 @@ import { newId } from '$lib/server/ids';
 import { addressSchema, flattenErrors, projectSchema, shipSchema } from '$lib/server/validation';
 import { openLessons } from '$lib/server/lessons';
 import { shipProject } from '$lib/server/ship';
-import { etDayLabel, type CampDayLite } from '$lib/camp-time';
+import { etDayLabel, isResubmitOpen, type CampDayLite } from '$lib/camp-time';
 import type { Address } from '$lib/types';
 import { env } from '$env/dynamic/private';
 
@@ -36,9 +36,30 @@ function projectFor(userId: string, campDayId: string) {
 
 const shippedStatuses = new Set(['submitted', 'approved', 'rejected']);
 
+/** Camp-day ids of the user's projects Ari sent back (changes/rejected) — kept
+ *  open for re-shipping until the resubmit window closes (end of Fri Jul 17 ET). */
+async function sentBackDayIds(userId: string, now: Date): Promise<Set<string>> {
+	if (!isResubmitOpen(now)) return new Set();
+	const rows = await db
+		.select({ campDayId: projects.campDayId })
+		.from(projects)
+		.where(
+			and(
+				eq(projects.userId, userId),
+				eq(projects.status, 'building'),
+				inArray(projects.ariStatus, ['changes', 'rejected']),
+				isNotNull(projects.campDayId)
+			)
+		);
+	return new Set(rows.map((r) => r.campDayId).filter((x): x is string => !!x));
+}
+
 export const load: PageServerLoad = async (event) => {
 	const user = requireUser(event);
-	const open = openLessons(new Date(), await loadDays());
+	const now = new Date();
+	const days = await loadDays();
+	const forceOpen = await sentBackDayIds(user.id, now);
+	const open = openLessons(now, days, forceOpen);
 
 	// Reward info (points + prize) for the open days, and a prior address to
 	// prefill the (always-required) ship address.
@@ -84,13 +105,16 @@ export const load: PageServerLoad = async (event) => {
 		})
 	);
 
-	return { lessons, identityVerified: user.identityVerified };
+	return { lessons, identityVerified: user.identityVerified, hasSentBack: forceOpen.size > 0 };
 };
 
-/** Find the requested open lesson, or null if it's missing/closed. */
-async function resolveOpenDay(campDayId: string | undefined) {
+/** Find the requested open lesson, or null if it's missing/closed. Honors the
+ *  per-user resubmit window for sent-back projects. */
+async function resolveOpenDay(campDayId: string | undefined, userId: string) {
 	if (!campDayId) return null;
-	const open = openLessons(new Date(), await loadDays());
+	const now = new Date();
+	const forceOpen = await sentBackDayIds(userId, now);
+	const open = openLessons(now, await loadDays(), forceOpen);
 	return open.find((d) => d.id === campDayId) ?? null;
 }
 
@@ -128,7 +152,7 @@ export const actions: Actions = {
 		const user = requireUser(event);
 		const form = await event.request.formData();
 		const campDayId = form.get('campDayId')?.toString();
-		const day = await resolveOpenDay(campDayId);
+		const day = await resolveOpenDay(campDayId, user.id);
 		if (!day) return fail(400, { campDayId, closed: true });
 
 		const parsed = projectSchema.safeParse(Object.fromEntries(form));
@@ -143,7 +167,7 @@ export const actions: Actions = {
 		const user = requireUser(event);
 		const form = await event.request.formData();
 		const campDayId = form.get('campDayId')?.toString();
-		const day = await resolveOpenDay(campDayId);
+		const day = await resolveOpenDay(campDayId, user.id);
 		if (!day) return fail(400, { campDayId, closed: true });
 
 		const data = Object.fromEntries(form);

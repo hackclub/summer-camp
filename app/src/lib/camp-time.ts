@@ -12,10 +12,19 @@ export const JOIN_OPENS = { hour: 11, minute: 50 };
 // to submit until this instant (end of Fri Jul 11 ET). Shared by the server-side
 // open-window logic and the UI banner/countdown.
 export function submissionCloseAt(): Date {
-	return etWallTime('2026-07-12', 0, 0); // midnight Jul 12 ET = through 11:59 PM Fri Jul 11
+	return etWallTime('2026-07-12', 0, 0); // midnight Jul 12 ET = through 11:59 PM Sat Jul 11
 }
 export function isLaunchGraceOpen(now: Date): boolean {
 	return now < submissionCloseAt();
+}
+
+// A project Ari sent back (changes/rejected) can be fixed and re-shipped past the
+// general close, until this instant (end of Fri Jul 17 ET).
+export function resubmitCloseAt(): Date {
+	return etWallTime('2026-07-18', 0, 0); // midnight Jul 18 ET = through 11:59 PM Fri Jul 17
+}
+export function isResubmitOpen(now: Date): boolean {
+	return now < resubmitCloseAt();
 }
 
 const ET = 'America/New_York';

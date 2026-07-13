@@ -1,10 +1,10 @@
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { announcements, campDays, campDayMaterials, projects } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/auth/guards';
 import { openLessons } from '$lib/server/lessons';
-import { etDayLabel, type CampDayLite } from '$lib/camp-time';
+import { etDayLabel, isResubmitOpen, type CampDayLite } from '$lib/camp-time';
 
 function loadDays(): Promise<CampDayLite[]> {
 	return db
@@ -104,12 +104,29 @@ export const load: PageServerLoad = async (event) => {
 	});
 	const toSubmit = openDays.filter((d) => !d.shipped).length;
 
+	// Any Ari-sent-back project still inside the resubmit window? Drives the banner.
+	const sentBack = isResubmitOpen(new Date())
+		? await db
+				.select({ id: projects.id })
+				.from(projects)
+				.where(
+					and(
+						eq(projects.userId, user.id),
+						eq(projects.status, 'building'),
+						inArray(projects.ariStatus, ['changes', 'rejected']),
+						isNotNull(projects.campDayId)
+					)
+				)
+				.limit(1)
+		: [];
+
 	return {
 		days,
 		announcements: latestAnnouncements,
 		myProjects,
 		openCount: open.length,
 		toSubmit,
-		openDays
+		openDays,
+		hasSentBack: sentBack.length > 0
 	};
 };

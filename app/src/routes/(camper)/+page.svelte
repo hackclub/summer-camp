@@ -43,6 +43,15 @@
 		</div>
 	{/if}
 
+	{#if data.hasSentBack}
+		<div
+			class="flex flex-wrap items-center justify-center gap-x-2 rounded-2xl border-4 border-berry bg-berry/10 px-5 py-3 text-center font-bold text-berry"
+		>
+			<span>A project of yours was sent back — fix it and resubmit until Friday, July 17 at 11:59 PM ET.</span>
+			<a href="{base}/submit" class="underline">Go to Submit</a>
+		</div>
+	{/if}
+
 	{#if data.openCount > 0}
 		<Card title="Submit a project">
 			{#if data.toSubmit > 0}

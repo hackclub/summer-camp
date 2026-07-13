@@ -36,6 +36,12 @@
 		</p>
 	{/if}
 
+	{#if data.hasSentBack}
+		<p class="rounded-xl border-4 border-berry bg-berry/10 p-3 text-center font-bold text-berry">
+			A project of yours was sent back — fix it and resubmit until Friday, July 17 at 11:59 PM ET.
+		</p>
+	{/if}
+
 	{#if justShipped}
 		<p class="rounded-xl bg-grass/20 p-3 text-center font-bold text-grass-dark">
 			Shipped! Counselors will review it and your Stardust lands once it's approved. 🎉
