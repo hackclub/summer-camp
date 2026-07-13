@@ -26,26 +26,41 @@ const NEW_STATUS: Record<string, 'approved' | 'building' | 'submitted'> = {
 // retries (which re-deliver the same event) no-ops.
 export const POST: RequestHandler = async (event) => {
 	const rawBody = await event.request.text();
-	const ok = verifyWebhook({
-		rawBody,
-		signature: event.request.headers.get('x-ari-signature'),
-		timestamp: event.request.headers.get('x-ari-timestamp'),
-		deliveryId: event.request.headers.get('x-ari-delivery-id'),
-		now: Date.now()
+	const sig = event.request.headers.get('x-ari-signature');
+	const ts = event.request.headers.get('x-ari-timestamp');
+	const deliveryId = event.request.headers.get('x-ari-delivery-id');
+	// Diagnostic: shows every arriving delivery + why it's accepted/rejected.
+	console.log('[ari] webhook recv', {
+		hasSig: !!sig,
+		ts,
+		deliveryId,
+		skewSec: ts && Number.isFinite(Number(ts)) ? Math.round(Date.now() / 1000 - Number(ts)) : null,
+		bodyLen: rawBody.length
 	});
-	if (!ok) return new Response('bad signature', { status: 401 });
+
+	const ok = verifyWebhook({ rawBody, signature: sig, timestamp: ts, deliveryId, now: Date.now() });
+	if (!ok) {
+		console.warn('[ari] webhook REJECTED — signature/timestamp/header check failed', {
+			hasSig: !!sig,
+			hasTs: !!ts,
+			hasDeliveryId: !!deliveryId
+		});
+		return new Response('bad signature', { status: 401 });
+	}
 
 	// Replay guard: record the delivery id; a re-sent (already-seen) delivery is
 	// acked without re-running side effects, even within the 5-minute signature
 	// window. (Belt-and-suspenders with the idempotent awards + status guard.)
-	const deliveryId = event.request.headers.get('x-ari-delivery-id');
 	if (deliveryId) {
 		const inserted = await db
 			.insert(webhookDeliveries)
 			.values({ deliveryId })
 			.onConflictDoNothing()
 			.returning({ id: webhookDeliveries.deliveryId });
-		if (inserted.length === 0) return new Response('ok', { status: 200 });
+		if (inserted.length === 0) {
+			console.log('[ari] duplicate delivery acked', deliveryId);
+			return new Response('ok', { status: 200 });
+		}
 	}
 
 	let payload: AriWebhook;
@@ -147,5 +162,6 @@ export const POST: RequestHandler = async (event) => {
 		// reverted / requeued: status reset above; no notification.
 	}
 
+	console.log('[ari] processed', payload.event, 'for', project.id, '->', newStatus);
 	return new Response('ok', { status: 200 });
 };
