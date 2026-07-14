@@ -8,6 +8,7 @@ import { requireUser } from '$lib/server/auth/guards';
 import { newId } from '$lib/server/ids';
 import { addressSchema, flattenErrors, projectSchema, shipSchema } from '$lib/server/validation';
 import { openLessons } from '$lib/server/lessons';
+import { activeExtensionDayIds } from '$lib/server/extensions';
 import { shipProject } from '$lib/server/ship';
 import { etDayLabel, isResubmitOpen, type CampDayLite } from '$lib/camp-time';
 import type { Address } from '$lib/types';
@@ -58,7 +59,9 @@ export const load: PageServerLoad = async (event) => {
 	const user = requireUser(event);
 	const now = new Date();
 	const days = await loadDays();
-	const forceOpen = await sentBackDayIds(user.id, now);
+	const sentBack = await sentBackDayIds(user.id, now);
+	const extended = await activeExtensionDayIds(user.id, now);
+	const forceOpen = new Set([...sentBack, ...extended]);
 	const open = openLessons(now, days, forceOpen);
 
 	// Reward info (points + prize) for the open days, and a prior address to
@@ -105,15 +108,23 @@ export const load: PageServerLoad = async (event) => {
 		})
 	);
 
-	return { lessons, identityVerified: user.identityVerified, hasSentBack: forceOpen.size > 0 };
+	return {
+		lessons,
+		identityVerified: user.identityVerified,
+		hasSentBack: sentBack.size > 0,
+		hasExtension: extended.size > 0
+	};
 };
 
 /** Find the requested open lesson, or null if it's missing/closed. Honors the
- *  per-user resubmit window for sent-back projects. */
+ *  per-user resubmit window for sent-back projects + admin-granted extensions. */
 async function resolveOpenDay(campDayId: string | undefined, userId: string) {
 	if (!campDayId) return null;
 	const now = new Date();
-	const forceOpen = await sentBackDayIds(userId, now);
+	const forceOpen = new Set([
+		...(await sentBackDayIds(userId, now)),
+		...(await activeExtensionDayIds(userId, now))
+	]);
 	const open = openLessons(now, await loadDays(), forceOpen);
 	return open.find((d) => d.id === campDayId) ?? null;
 }

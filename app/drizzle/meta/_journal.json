@@ -71,6 +71,13 @@
       "when": 1781903271651,
       "tag": "0009_user_birthday",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1781904271651,
+      "tag": "0010_extensions",
+      "breakpoints": true
     }
   ]
 }

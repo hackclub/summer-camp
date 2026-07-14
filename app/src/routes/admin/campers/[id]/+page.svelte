@@ -49,6 +49,58 @@
 	</form>
 </div>
 
+<div class="mb-6 rounded-lg border border-slate-200 bg-white p-4">
+	<h2 class="mb-2 font-bold text-slate-800">Submission extensions</h2>
+	<p class="mb-3 text-sm text-slate-500">
+		Open a single lesson for this camper past the normal window, through 11:59 PM ET on the chosen
+		date.
+	</p>
+	<form method="POST" action="?/grantExtension" use:enhance class="flex flex-wrap items-end gap-2">
+		<label class="text-sm text-slate-600">
+			Lesson
+			<select
+				name="campDayId"
+				required
+				class="block rounded border border-slate-300 px-2 py-1 text-sm"
+			>
+				{#each data.allDays as d (d.id)}
+					<option value={d.id}>{etDayLabel(d.date)} — {d.title}</option>
+				{/each}
+			</select>
+		</label>
+		<label class="text-sm text-slate-600">
+			Open until
+			<input
+				type="date"
+				name="until"
+				required
+				class="block rounded border border-slate-300 px-2 py-1 text-sm"
+			/>
+		</label>
+		<button
+			type="submit"
+			class="rounded bg-slate-800 px-3 py-1.5 text-sm font-bold text-white hover:bg-slate-700"
+		>
+			Grant extension
+		</button>
+	</form>
+	{#if data.camperExtensions.length > 0}
+		<ul class="mt-3 flex flex-col gap-1">
+			{#each data.camperExtensions as ext (ext.id)}
+				<li class="flex items-center gap-3 text-sm text-slate-700">
+					<span>
+						{etDayLabel(ext.date)} — {ext.title} · until {new Date(ext.until).toLocaleDateString()}
+					</span>
+					<form method="POST" action="?/revokeExtension" use:enhance>
+						<input type="hidden" name="id" value={ext.id} />
+						<button type="submit" class="text-red-600 underline">revoke</button>
+					</form>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+</div>
+
 <div class="grid gap-6 lg:grid-cols-2">
 	<div>
 		<h2 class="mb-2 font-bold text-slate-800">Adjust points</h2>

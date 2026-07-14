@@ -49,6 +49,25 @@ export const webhookDeliveries = pgTable('webhook_deliveries', {
 	createdAt: createdAt()
 });
 
+// Admin-granted per-camper, per-day submission extensions. While `until` is in
+// the future, that camper's lesson stays open to submit past the normal window.
+export const extensions = pgTable(
+	'extensions',
+	{
+		id: id(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		campDayId: text('camp_day_id')
+			.notNull()
+			.references(() => campDays.id, { onDelete: 'cascade' }),
+		until: timestamp('until', { withTimezone: true }).notNull(),
+		createdBy: text('created_by').references(() => users.id),
+		createdAt: createdAt()
+	},
+	(t) => [uniqueIndex('extensions_user_day_idx').on(t.userId, t.campDayId)]
+);
+
 export const magicLinkTokens = pgTable(
 	'magic_link_tokens',
 	{

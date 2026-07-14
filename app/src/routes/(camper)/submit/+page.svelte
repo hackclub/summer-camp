@@ -42,6 +42,13 @@
 		</p>
 	{/if}
 
+	{#if data.hasExtension}
+		<p class="rounded-xl border-4 border-grass bg-grass/15 p-3 text-center font-bold text-grass-dark">
+			You've been given an extension — a lesson below is open for you to submit. Ship it before it
+			closes!
+		</p>
+	{/if}
+
 	{#if justShipped}
 		<p class="rounded-xl bg-grass/20 p-3 text-center font-bold text-grass-dark">
 			Shipped! Counselors will review it and your Stardust lands once it's approved. 🎉
